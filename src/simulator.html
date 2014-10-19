@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 10/18/14 - 12:33 AM
+Last Updated: 10/19/14 - 12:51 AM
 -->
 
 
@@ -51,36 +51,51 @@ Last Updated: 10/18/14 - 12:33 AM
 			fColor = vColor;
 			gl_Position = rz * ry * rx * vPosition;
 		} // End vertex shader function main()
-</script>
+	</script>
 
-<script id="fragment-shader" type="x-shader/x-fragment">
+	<!-- Fragment Shader -->
+	<script id="fragment-shader" type="x-shader/x-fragment">
 
-precision mediump float;
+		precision mediump float;
 
-varying vec4 fColor;
+		varying vec4 fColor;
 
-void main()
-{
-	gl_FragColor = fColor;
-}
-</script>
+		void main() {
+			gl_FragColor = fColor;
+		} // End fragment shader function main()
+	</script>
 
-<script type="text/javascript" src="webgl-utils.js"></script>
-<script type="text/javascript" src="initShaders.js"></script>
-<script type="text/javascript" src="MV.js"></script>
-<script type="text/javascript" src="cube.js"></script>
+	<script type="text/javascript" src="webgl-utils.js"></script>
+	<script type="text/javascript" src="initShaders.js"></script>
+	<script type="text/javascript" src="MV.js"></script>
+	<script type="text/javascript" src="simulator.js"></script>
 
-<body>
-	<canvas id="gl-canvas" width="512"" height="512">
-		Oops ... your browser doesn't support the HTML5 canvas element
-	</canvas>
+	<body>
+		<canvas id="gl-canvas" width="512" height="512">
+			Oops ... your browser doesn't support the HTML5 canvas element
+		</canvas>
 	
-	<br/>
+		<br/>
 
-<button id= "xButton">Rotate X</button>
-<button id= "yButton">Rotate Y</button>
-<button id= "zButton">Rotate Z</button>
+		<button id= "xButton">Rotate X</button>
+		<button id= "yButton">Rotate Y</button>
+		<button id= "zButton">Rotate Z</button>
 
-</body>
+		<!-- TEST ONLY -->
+
+		<form>
+			<select name="element">
+				<option value="button">Button</option>
+				<option value="text">Textbox</option>
+				<option value="radio">Radio</option>
+			</select>
+
+			<input type="button" value="Add" onclick="addHTMLElement(document.forms[0].element.value)"/>
+		
+			<span id="nonexistent">&nbsp;</span>
+		</form>
+		<!-- END TEST ONLY -->
+
+	</body>
 </html>
 

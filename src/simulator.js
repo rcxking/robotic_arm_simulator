@@ -1,3 +1,12 @@
+/*
+ * simulator.js - The dynamic Javascript code for the Robotic Arm Simulator.
+ *
+ * Bryant Pong
+ * ECSE-4750
+ * 10/18/14
+ *
+ * Last Updated: 10/19/14 - 12:51 AM
+ */ 
 
 var canvas;
 var gl;
@@ -15,6 +24,28 @@ var axis = 0;
 var theta = [ 0, 0, 0 ];
 
 var thetaLoc;
+
+/*
+ * This function allows new HTML elements to be added to the simulator webpage.
+ * This function is used to create new slider elements when a new robot arm
+ * joint is created.
+ */
+function addHTMLElement(type) {
+
+	// We will be using the DOM's createElement() function: 
+	var element = document.createElement("input");
+
+	// Set the attributes of this new input element:
+	element.setAttribute("type", type);
+	element.setAttribute("value", type);
+	element.setAttribute("name", type);
+
+	// We need to get a generic item in the DOM to append the new element:
+	var genericItem = document.getElementById("nonexistent");
+	
+	// Add the new input element into the page:
+	genericItem.appendChild(element); 
+} // End function addHTMLElement()
 
 window.onload = function init()
 {

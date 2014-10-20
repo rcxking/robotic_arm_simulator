@@ -5,12 +5,13 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/20/14 - 3:29 PM
+ * Last Updated: 10/20/14 - 4:11 PM
  */ 
 
 var canvas;
 var gl;
 
+// Remove when implementing arm graphics
 var NumVertices  = 36;
 
 var points = [];
@@ -112,16 +113,29 @@ window.onload = function init()
  * the angle to rotate by (in radians).
  *
  * Inputs: theta (rotation angle in radians)
+ * Returns: 2x2 mat2() Rotation Matrix
  *
  * Verified/Tested 10/20/14
  */
 function rot2D(theta) {
-	var rotationMatrix = [[Math.cos(theta), -1*Math.sin(theta)], 
-	                      [Math.sin(theta), Math.cos(theta)]];  
+	// var rotationMatrix = [[Math.cos(theta), -1*Math.sin(theta)], 
+	//                       [Math.sin(theta), Math.cos(theta)]];  
 
-	return rotationMatrix;
+	return mat2(Math.cos(theta), -1 * Math.sin(theta), Math.sin(theta), Math.cos(theta));
 } // End function rot2D()
 
+/*
+ * rot3D() creates a 3-Dimensional rotation matrix via the Euler-Rodrigues
+ * formula.  This function requires a vector of length 3 for the rotation
+ * axis and the rotation angle (in radians).
+ *
+ * Inputs: k (3x1 vector representing the axis of rotation)
+ *         theta (rotation angle in radians) 
+ * Returns: 3x3 Rotation Matrix
+ */
+function rot3D(theta) {
+
+} // End function rot3D()
 
 
 /*** End Section Kinematics Functions ***/

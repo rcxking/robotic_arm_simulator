@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/19/14 - 12:51 AM
+ * Last Updated: 10/20/14 - 3:29 PM
  */ 
 
 var canvas;
@@ -15,6 +15,9 @@ var NumVertices  = 36;
 
 var points = [];
 var colors = [];
+
+// This array holds the Cartesian locations of all the rotational joints:
+var joints = [];
 
 var xAxis = 0;
 var yAxis = 1;
@@ -29,6 +32,8 @@ var thetaLoc;
  * This function allows new HTML elements to be added to the simulator webpage.
  * This function is used to create new slider elements when a new robot arm
  * joint is created.
+ *
+ * TESTED/VERTIFIED
  */
 function addHTMLElement(type) {
 
@@ -100,6 +105,27 @@ window.onload = function init()
     render();
 }
 
+/*** Kinematics Functions ***/
+
+/* 
+ * rot2D() creates a 2-Dimensional rotation matrix.  This function requires
+ * the angle to rotate by (in radians).
+ *
+ * Inputs: theta (rotation angle in radians)
+ *
+ * Verified/Tested 10/20/14
+ */
+function rot2D(theta) {
+	var rotationMatrix = [[Math.cos(theta), -1*Math.sin(theta)], 
+	                      [Math.sin(theta), Math.cos(theta)]];  
+
+	return rotationMatrix;
+} // End function rot2D()
+
+
+
+/*** End Section Kinematics Functions ***/
+
 function colorCube()
 {
     quad( 1, 0, 3, 2 );
@@ -147,13 +173,13 @@ function quad(a, b, c, d)
         colors.push( vertexColors[indices[i]] );
     
         // for solid colored faces use 
-        //colors.push(vertexColors[a]);
+        // colors.push(vertexColors[a]);
         
     }
 }
 
-function render()
-{
+// Rendering function:
+function render() {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     theta[axis] += 2.0;
@@ -162,5 +188,5 @@ function render()
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
 
     requestAnimFrame( render );
-}
+} // End function render()
 

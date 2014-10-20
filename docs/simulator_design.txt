@@ -1,0 +1,15 @@
+Robotic Arm Simulator Design Choices - Last Updated: 10/20/14 - 3:39 PM 
+-----------------------------------------------------------------------
+
+Project Requirements
+--------------------
+1) Background should be a grid pattern to allow users to easily visually know
+the location of a joint.
+
+2) User interface should allow users to dynamically add/remove joints from a list.   
+
+3) When a joint is created, a new slider should appear that controls the joint's
+rotation from 0 to 2*pi radians. 
+
+4) Robot's forward and inverse kinematics should be displayed.   
+

@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/20/14 - 8:10 PM
+ * Last Updated: 10/21/14 - 6:35 PM
  */ 
 
 var canvas;
@@ -119,6 +119,8 @@ window.onload = function init()
  * Inputs: scale (integer scalar)
  *         mat (the matrix to scale)
  * Returns: scaled matrix
+ *
+ * Verified/Tested 10/21
  */   
 function scaleMatrix(scale, mat) {
 
@@ -177,6 +179,11 @@ function rot3D(k, theta) {
 	var I3 = mat3(1, 0, 0,
 	              0, 1, 0,
                   0, 0, 1);
+
+	var subMatrix = add(add(I3, scaleMatrix(Math.sin(theta), kx)),
+	                    mult(scaleMatrix((1-Math.cos(theta)), kx), kx));
+
+	return subMatrix;
 
 	
 

@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/20/14 - 4:11 PM
+ * Last Updated: 10/20/14 - 8:10 PM
  */ 
 
 var canvas;
@@ -53,6 +53,11 @@ function addHTMLElement(type) {
 	genericItem.appendChild(element); 
 } // End function addHTMLElement()
 
+
+/*
+ * Onload - This function is executed when the browser is opened.  Equivalent
+ * to int main() in C.
+ */
 window.onload = function init()
 {
     canvas = document.getElementById( "gl-canvas" );
@@ -104,9 +109,33 @@ window.onload = function init()
     };
         
     render();
-}
+} // End function init()
 
-/*** Kinematics Functions ***/
+/*** ADDITIONAL MATRIX/VECTOR FUNCTIONS ***/
+
+/*
+ * scaleMatrix() multiplies all elements in a matrix by a scalar.
+ *
+ * Inputs: scale (integer scalar)
+ *         mat (the matrix to scale)
+ * Returns: scaled matrix
+ */   
+function scaleMatrix(scale, mat) {
+
+	var scaledMat = mat3();
+	
+	for(var i = 0; i < mat.length; i++) {
+		for(var j = 0; j < mat[0].length; j++) {
+			scaledMat[i][j] = mat[i][j] * 3;
+		} // End for
+	} // End for
+
+	return scaledMat;
+} // End function scaleMatrix()
+
+/*** END SECTION ADDITIONAL MATRIX/VECTOR FUNCTIONS ***/
+
+/*** KINEMATICS FUNCTIONS ***/
 
 /* 
  * rot2D() creates a 2-Dimensional rotation matrix.  This function requires
@@ -118,10 +147,8 @@ window.onload = function init()
  * Verified/Tested 10/20/14
  */
 function rot2D(theta) {
-	// var rotationMatrix = [[Math.cos(theta), -1*Math.sin(theta)], 
-	//                       [Math.sin(theta), Math.cos(theta)]];  
-
-	return mat2(Math.cos(theta), -1 * Math.sin(theta), Math.sin(theta), Math.cos(theta));
+	return mat2(Math.cos(theta), -1 * Math.sin(theta), 
+	            Math.sin(theta), Math.cos(theta));
 } // End function rot2D()
 
 /*
@@ -133,7 +160,25 @@ function rot2D(theta) {
  *         theta (rotation angle in radians) 
  * Returns: 3x3 Rotation Matrix
  */
-function rot3D(theta) {
+function rot3D(k, theta) {
+
+	/*
+	 * The Euler-Rodrigues formula for 3D Rotations is the following equation:
+	 * rot(k, theta) = Identity 3x3 + sin(theta) * kx + (1-cos(theta)) * kx * kx
+	 * where kx is the skew-symmetric matrix:
+	 *
+	 *    0 -k[2] k[1]
+	 *  k[2]   0 -k[0]
+	 * -k[1] k[0]   0
+	 */ 
+	var kx = mat3(     0, -1*k[2],   k[1],
+	                 k[2],     0, -1*k[0],
+				  -1*k[1],   k[0],     0);
+	var I3 = mat3(1, 0, 0,
+	              0, 1, 0,
+                  0, 0, 1);
+
+	
 
 } // End function rot3D()
 

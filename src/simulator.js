@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/21/14 - 6:35 PM
+ * Last Updated: 10/22/14 - 11:08 PM
  */ 
 
 var canvas;
@@ -19,6 +19,9 @@ var colors = [];
 
 // This array holds the Cartesian locations of all the rotational joints:
 var joints = [];
+
+// Variable to keep track of the number of joints on the arm:
+var numberOfJoints = 0;
 
 var xAxis = 0;
 var yAxis = 1;

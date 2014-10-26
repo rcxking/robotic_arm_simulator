@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/22/14 - 11:08 PM
+ * Last Updated: 10/25/14 - 9:12 PM
  */ 
 
 var canvas;
@@ -20,8 +20,15 @@ var colors = [];
 // This array holds the Cartesian locations of all the rotational joints:
 var joints = [];
 
+/*
+ * This array holds the lengths of the joint links.  The ith link is the link
+ * between ith joint and the i+1th joint.  For example, links[0] holds the link
+ * P01.
+ */
+var links = [];
+
 // Variable to keep track of the number of joints on the arm:
-var numberOfJoints = 0;
+var numberOfJoints = 0; 
 
 var xAxis = 0;
 var yAxis = 1;
@@ -31,6 +38,8 @@ var axis = 0;
 var theta = [ 0, 0, 0 ];
 
 var thetaLoc;
+
+var hasLoaded = 0;
 
 /*
  * This function allows new HTML elements to be added to the simulator webpage.
@@ -63,6 +72,7 @@ function addHTMLElement(type) {
  */
 window.onload = function init()
 {
+
     canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
@@ -99,8 +109,10 @@ window.onload = function init()
 
     thetaLoc = gl.getUniformLocation(program, "theta"); 
     
-    //event listeners for buttons
-    
+	/** REMOVE THIS SECTION **/
+    //event listeners for buttons 
+	
+	/*   
     document.getElementById( "xButton" ).onclick = function () {
         axis = xAxis;
     };
@@ -110,8 +122,37 @@ window.onload = function init()
     document.getElementById( "zButton" ).onclick = function () {
         axis = zAxis;
     };
+	*/
+	document.getElementById("cubeAngleX").onchange = function() {
+		//theta = document.getElementById("cubeAngle").value;
+		axis = xAxis;
+		theta[axis] = document.getElementById("cubeAngleX").value;
+		render();
+	};
+
+	document.getElementById("cubeAngleY").onchange = function() {
+        //theta = document.getElementById("cubeAngle").value;
+        axis = yAxis;
+        theta[axis] = document.getElementById("cubeAngleY").value;
+        render();
+    };
+
+    document.getElementById("cubeAngleZ").onchange = function() {
+        //theta = document.getElementById("cubeAngle").value;
+        axis = zAxis;
+        theta[axis] = document.getElementById("cubeAngleZ").value;
+        render();
+    };
+
+
+	/** END REMOVE THIS SECTION **/
         
-    render();
+	if(hasLoaded === 0) {
+		console.log("DEBUG ONLY - I have rendered!");
+		render();
+		hasLoaded = 1;
+	} // End if
+    //render();
 } // End function init()
 
 /*** ADDITIONAL MATRIX/VECTOR FUNCTIONS ***/
@@ -251,7 +292,7 @@ function quad(a, b, c, d)
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    theta[axis] += 2.0;
+    //theta[axis] += 2.0;
     gl.uniform3fv(thetaLoc, theta);
 
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );

@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 10/22/14 - 11:14 PM
+Last Updated: 10/25/14 - 9:19 PM
 -->
 
 
@@ -18,6 +18,9 @@ Last Updated: 10/22/14 - 11:14 PM
 	<!-- Vertex Shader -->
 	<script id="vertex-shader" type="x-shader/x-vertex">
 
+		/* 
+		 * Vertex Attributes:
+		 */
 		attribute  vec4 vPosition;
 		attribute  vec4 vColor;
 		varying vec4 fColor;
@@ -49,7 +52,7 @@ Last Updated: 10/22/14 - 11:14 PM
 							0.0,  0.0, 0.0, 1.0 );
 
 			fColor = vColor;
-			gl_Position = rz * ry * rx * vPosition;
+			gl_Position = rz * ry * rx * vPosition; // rz * ry * rx * vPosition;
 		} // End vertex shader function main()
 	</script>
 
@@ -79,9 +82,16 @@ Last Updated: 10/22/14 - 11:14 PM
 
 		<!-- REMOVE THIS CODE WHEN IMPLEMENTING ROBOT -->
 
+		<!--
 		<button id= "xButton">Rotate X</button>
 		<button id= "yButton">Rotate Y</button>
 		<button id= "zButton">Rotate Z</button>
+		-->
+
+		<input id="cubeAngleX" type="range" min="0" max="400" step="0.01">Adjust Cube Angle (X-Axis)</input>
+		<input id="cubeAngleY" type="range" min="0" max="400" step="0.01">Adjust Cube Angle (Y-Axis)</input>
+		<input id="cubeAngleZ" type="range" min="0" max="400" step="0.01">Adjust Cube Angle (Z-Axis)</input>
+
 
 		<!-- END SECTION TO REMOVE -->
 

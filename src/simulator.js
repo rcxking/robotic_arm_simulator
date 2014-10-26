@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/25/14 - 11:10 PM
+ * Last Updated: 10/26/14 - 12:51 AM
  */ 
 
 var canvas;
@@ -29,6 +29,11 @@ var links = [];
 
 // Variable to keep track of the number of joints on the arm:
 var numberOfJoints = 0; 
+
+// These constants are used to represent a coordinate frame for the X-Y-Z origin frame:
+var originFrameX = [1, 0, 0];
+var originFrameY = [0, 1, 0];
+var originFrameZ = [0, 0, 1];
 
 var xAxis = 0;
 var yAxis = 1;
@@ -149,6 +154,8 @@ window.onload = function init()
         
 	if(hasLoaded === 0) {
 		console.log("DEBUG ONLY - I have rendered!");
+		points.push(originFrameX);
+		colors.push([0.0, 0.0, 0.0, 1.0]);
 		render();
 		hasLoaded = 1;
 	} // End if
@@ -236,6 +243,13 @@ function rot3D(k, theta) {
 
 /*** End Section Kinematics Functions ***/
 
+/*** Drawing Functions ***/
+
+// This function draws the X-Axis:
+function drawXAxis() {
+
+} // End function drawXAxis()
+
 function colorCube()
 {
     quad( 1, 0, 3, 2 );
@@ -249,14 +263,14 @@ function colorCube()
 function quad(a, b, c, d) 
 {
     var vertices = [
-        vec3( -0.5, -0.5,  0.5 ),
-        vec3( -0.5,  0.5,  0.5 ),
-        vec3(  0.5,  0.5,  0.5 ),
-        vec3(  0.5, -0.5,  0.5 ),
-        vec3( -0.5, -0.5, -0.5 ),
-        vec3( -0.5,  0.5, -0.5 ),
-        vec3(  0.5,  0.5, -0.5 ),
-        vec3(  0.5, -0.5, -0.5 )
+        vec3( -0.05, -0.05,  0.05 ),
+        vec3( -0.05,  0.05,  0.05 ),
+        vec3(  0.05,  0.05,  0.05 ),
+        vec3(  0.05, -0.05,  0.05 ),
+        vec3( -0.05, -0.05, -0.05 ),
+        vec3( -0.05,  0.05, -0.05 ),
+        vec3(  0.05,  0.05, -0.05 ),
+        vec3(  0.05, -0.05, -0.05 )
     ];
 
     var vertexColors = [

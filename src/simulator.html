@@ -52,9 +52,14 @@ Last Updated: 10/25/14 - 11:10 PM
 							s.z,  c.z, 0.0, 0.0,
 							0.0,  0.0, 1.0, 0.0,
 							0.0,  0.0, 0.0, 1.0 );
+							
+			/*mat4 test = mat4(1.0, 0.0, 0.0, 0.0,
+			                 0.0, 1.0, 0.0, 0.0,
+							 0.0, 0.0, 1.0, 0.0,
+							 0.25, 0.25, 0.25, 1.0);*/
 
 			fColor = vColor;
-			gl_Position = rz * ry * rx * vPosition; // rz * ry * rx * vPosition;
+			gl_Position = test * rz * ry * rx * vPosition; // rz * ry * rx * vPosition;
 		} // End vertex shader function main()
 	</script>
 

@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/26/14 - 12:51 AM
+ * Last Updated: 10/27/14 - 10:54 PM
  */ 
 
 var canvas;
@@ -43,6 +43,8 @@ var axis = 0;
 var theta = [ 0, 0, 0 ];
 
 var thetaLoc;
+
+var modelViewMatrixLoc;
 
 var hasLoaded = 0;
 
@@ -309,8 +311,14 @@ function render() {
     //theta[axis] += 2.0;
     gl.uniform3fv(thetaLoc, theta);
 
+	// We want the camera to look from the point (1, 1, 1):
+	modelViewMatrix = lookAt([1.0, 1.0, 1.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0]);
+	//projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+	
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+	
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
 
-    requestAnimFrame( render );
+    //requestAnimFrame( render );
 } // End function render()
 

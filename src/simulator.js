@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 10/27/14 - 10:54 PM
+ * Last Updated: 11/1/14 - 11:59 PM
  */ 
 
 var canvas;
@@ -42,9 +42,21 @@ var zAxis = 2;
 var axis = 0;
 var theta = [ 0, 0, 0 ];
 
+// Perspective Matrix Constants:
+var left = -1.0;
+var right = 1.0;
+var ytop = 1.0
+var near = -1;
+var far = 1;
+var bottom = -1.0;
+
 var thetaLoc;
 
+var modelViewMatrix;
 var modelViewMatrixLoc;
+
+var projectionMatrix;
+var projectionMatrixLoc;
 
 var hasLoaded = 0;
 
@@ -114,22 +126,11 @@ window.onload = function init()
     gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+	// Set the shader variable locations:
     thetaLoc = gl.getUniformLocation(program, "theta"); 
-    
-	/** REMOVE THIS SECTION **/
-    //event listeners for buttons 
-	
-	/*   
-    document.getElementById( "xButton" ).onclick = function () {
-        axis = xAxis;
-    };
-    document.getElementById( "yButton" ).onclick = function () {
-        axis = yAxis;
-    };
-    document.getElementById( "zButton" ).onclick = function () {
-        axis = zAxis;
-    };
-	*/
+	modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
+	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+    	
 	document.getElementById("cubeAngleX").onchange = function() {
 		//theta = document.getElementById("cubeAngle").value;
 		axis = xAxis;
@@ -265,14 +266,14 @@ function colorCube()
 function quad(a, b, c, d) 
 {
     var vertices = [
-        vec3( -0.05, -0.05,  0.05 ),
-        vec3( -0.05,  0.05,  0.05 ),
-        vec3(  0.05,  0.05,  0.05 ),
-        vec3(  0.05, -0.05,  0.05 ),
-        vec3( -0.05, -0.05, -0.05 ),
-        vec3( -0.05,  0.05, -0.05 ),
-        vec3(  0.05,  0.05, -0.05 ),
-        vec3(  0.05, -0.05, -0.05 )
+        vec3( -0.5, -0.5,  0.5 ),
+        vec3( -0.5,  0.5,  0.5 ),
+        vec3(  0.5,  0.5,  0.5 ),
+        vec3(  0.5, -0.5,  0.5 ),
+        vec3( -0.5, -0.5, -0.5 ),
+        vec3( -0.5,  0.5, -0.5 ),
+        vec3(  0.5,  0.5, -0.5 ),
+        vec3(  0.5, -0.5, -0.5 )
     ];
 
     var vertexColors = [
@@ -312,9 +313,16 @@ function render() {
     gl.uniform3fv(thetaLoc, theta);
 
 	// We want the camera to look from the point (1, 1, 1):
-	modelViewMatrix = lookAt([1.0, 1.0, 1.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0]);
-	//projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+	modelViewMatrix = lookAt([0.1, 0.1, 0.1], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0]);
+	projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 	
+	// The modelViewMatrix (in column-major format) 
+	/*modelViewMatrix = mat4(1.0, 0, 0, 0, 
+	                       	   0, 1.0, 0, 0,
+   							   0, 0, 1.0, 0,
+							   0, 0, -0.3, 1.0);*/
+
+	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 	
     gl.drawArrays( gl.TRIANGLES, 0, NumVertices );

@@ -1,0 +1,4 @@
+11/2/14
+-------
+- Added Model View and Projection Matrices
+	- have a view from (0.1, 0.1, 0.1)  

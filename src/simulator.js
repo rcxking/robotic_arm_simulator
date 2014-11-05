@@ -5,13 +5,13 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/4/14 - 5:36 PM
+ * Last Updated: 11/4/14 - 7:24 PM
  */ 
 
 var canvas;
 var gl;
 
-// Remove when implementing arm graphics
+// The number of vertices to render:
 var NumVertices  = 0;
 
 var points = [];
@@ -98,8 +98,12 @@ window.onload = function init()
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     //colorCube();
- 	drawJoint(0.5, 0.0, 0.0);
-	drawJoint(0.0, 0.0, 0.0);
+ 	//drawJoint(0.5, 0.0, 0.0);
+	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
+	joints.push([0.0, 0.0, 0.0, 2]);
+	joints.push([0.5, 0.0, 0.0, 1]);
+	drawAllJoints(joints);
+	drawLink(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -263,8 +267,15 @@ function drawZAxis() {
 
 } // End function drawZAxis()
 
+// This function takes a list of joint parameters and draws all of them:
+function drawAllJoints(listOfJoints) {
+	for(var i = 0; i < listOfJoints.length; i++) {
+		drawJoint(listOfJoints[i][0], listOfJoints[i][1], listOfJoints[i][2], listOfJoints[i][3]);
+	} // End for
+} // End function drawAllJoints()
+
 // This function draws a joint.  A joint is represented as a cube.
-function drawJoint(jointX, jointY, jointZ) {
+function drawJoint(jointX, jointY, jointZ, color) {
 
 	console.log("Now calling drawJoint() at:");
 	console.log("jointX: " + jointX);
@@ -293,15 +304,18 @@ function drawJoint(jointX, jointY, jointZ) {
 							5, 4, 0, 5, 0, 1 ];
 
 	// The joint will be a solid cube of red:
-	var jointColor = vec4(1.0, 0.0, 0.0, 1.0);
+	var jointColors = [
+					vec4(1.0, 0.0, 0.0, 1.0), // Red
+					vec4(0.0, 1.0, 0.0, 1.0), // Green
+					vec4(0.0, 0.0, 1.0, 1.0) // Blue
+					];
 
 	// Add all vertices to be rendered:
 	for(var i = 0; i < verticesOfJoints.length; i++) {
 		points.push(vertices[verticesOfJoints[i]]);
-		colors.push(jointColor);
+		colors.push(jointColors[color]);
 	} // End for 
 														
-
 	// For each joint, there are 36 vertices to render:
 	NumVertices += 36;	
 
@@ -316,7 +330,41 @@ function drawJoint(jointX, jointY, jointZ) {
 } // End function drawJoint()
 
 // This function draws a link.  A link is represented by a rectangular prism:
-function drawLink() {
+function drawLink(startX, startY, startZ,
+                  endX,   endY,   endZ) {
+
+	// Calculate the length of this link:
+	//var linkLength = Math.sqrt((  
+
+	// The vertices of the link:
+	var vertices = [
+        vec3(startX - 0.01, startY - 0.01, startZ + 0.01),
+        vec3(startX - 0.01, startY + 0.01, startZ + 0.01),
+        vec3(endX + 0.01, endY + 0.01, endZ + 0.01),
+        vec3(endX + 0.01, endY - 0.01, endZ + 0.01),
+        vec3(startX - 0.01, startY - 0.01, startZ - 0.01),
+        vec3(startX - 0.01, startY + 0.01, startZ - 0.01),
+        vec3(endX + 0.01, endY + 0.01, endZ - 0.01),
+        vec3(endX + 0.01, endY - 0.01, endZ - 0.01)
+    ];
+
+	// This link will be colored black:
+	var linkColor = vec4(0.0, 0.0, 0.0, 1.0);
+
+	var verticesOfJoints = [1, 0, 3, 1, 3, 2,
+                            2, 3, 7, 2, 7, 6,
+                            3, 0, 4, 3, 4, 7,
+                            6, 5, 1, 6, 1, 2,
+                            4, 5, 6, 4, 6, 7,
+                            5, 4, 0, 5, 0, 1 ];
+
+    for(var i = 0; i < verticesOfJoints.length; i++) {
+		points.push(vertices[verticesOfJoints[i]]);
+		colors.push(linkColor);
+	} // End for
+
+	// There are 36 vertices to render:
+	NumVertices += 26;
 
 } // End function drawLink()
 

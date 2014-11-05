@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 11/1/14 - 11:59 PM
+Last Updated: 11/4/14 - 5:32 PM
 -->
 
 
@@ -96,24 +96,30 @@ Last Updated: 11/1/14 - 11:59 PM
 
 		<!-- REMOVE THIS CODE WHEN IMPLEMENTING ROBOT -->
 
-		<input id="cubeAngleX" type="range" min="0" max="400" step="0.01">Adjust Cube Angle (X-Axis)</input>
-		<input id="cubeAngleY" type="range" min="0" max="400" step="0.01">Adjust Cube Angle (Y-Axis)</input>
-		<input id="cubeAngleZ" type="range" min="0" max="400" step="0.01">Adjust Cube Angle (Z-Axis)</input>
+		<input id="cubeAngleX" type="range" min="0" max="400" value="0" step="0.01">Adjust Cube Angle (X-Axis)</input>
+		<input id="cubeAngleY" type="range" min="0" max="400" value="0" step="0.01">Adjust Cube Angle (Y-Axis)</input>
+		<input id="cubeAngleZ" type="range" min="0" max="400" value="0" step="0.01">Adjust Cube Angle (Z-Axis)</input>
 		<!-- END SECTION TO REMOVE -->
 
-		<form>
-			<select name="element">
-				<option value="button">Button</option>
-				<option value="text">Textbox</option>
-				<option value="radio">Radio</option>
-				<option value="range">Range</option>
-			</select>
+		<!-- Joints Section--> 
+		<div id="joints">
 
-			<input type="button" value="Add Joint" onclick="addHTMLElement(document.forms[0].element.value)"/>
+			<h1 id="joints">Joints</h1>
+
+			<form>
+				<select name="element">
+					<option value="button">Button</option>
+					<option value="text">Textbox</option>
+					<option value="radio">Radio</option>
+					<option value="range">Range</option>
+				</select>
+
+				<input type="button" value="Add Joint" onclick="addHTMLElement(document.forms[0].element.value)"/>
 		
-			<span id="nonexistent">&nbsp;</span>
-		</form>
-		<!-- END TEST ONLY -->
+				<span id="nonexistent">&nbsp;</span>
+			</form>
+		</div>
+		<!-- END JOINTS SECTION -->
 
 	</body>
 </html>

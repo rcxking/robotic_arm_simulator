@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/25/14
  *
- * Last Updated: 10/25/14 - 11:14 PM
+ * Last Updated: 11/4/14 - 5:46 PM
  */
 body {
 	background-color: lightgrey;
@@ -16,3 +16,9 @@ h1 {
 	text-align: center;
 	     color: black;
 }
+
+/* Formatting for the joints section. */ 
+#joints {
+	text-align: center;
+		 color: black;
+} 

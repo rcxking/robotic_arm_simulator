@@ -5,14 +5,14 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/1/14 - 11:59 PM
+ * Last Updated: 11/4/14 - 5:36 PM
  */ 
 
 var canvas;
 var gl;
 
 // Remove when implementing arm graphics
-var NumVertices  = 36;
+var NumVertices  = 0;
 
 var points = [];
 var colors = [];
@@ -97,7 +97,9 @@ window.onload = function init()
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    colorCube();
+    //colorCube();
+ 	drawJoint(0.5, 0.0, 0.0);
+	drawJoint(0.0, 0.0, 0.0);
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -253,6 +255,71 @@ function drawXAxis() {
 
 } // End function drawXAxis()
 
+function drawYAxis() {
+
+} // End function drawYAxis()
+
+function drawZAxis() {
+
+} // End function drawZAxis()
+
+// This function draws a joint.  A joint is represented as a cube.
+function drawJoint(jointX, jointY, jointZ) {
+
+	console.log("Now calling drawJoint() at:");
+	console.log("jointX: " + jointX);
+	console.log("jointY: " + jointY);
+	console.log("jointZ: " + jointZ);
+	// The vertices of the joint:
+	var vertices = [
+		vec3(jointX	- 0.04, jointY - 0.04, jointZ + 0.04),
+		vec3(jointX - 0.04, jointY + 0.04, jointZ + 0.04),
+        vec3(jointX + 0.04, jointY + 0.04, jointZ + 0.04),
+        vec3(jointX + 0.04, jointY - 0.04, jointZ + 0.04),
+        vec3(jointX - 0.04, jointY - 0.04, jointZ - 0.04),
+        vec3(jointX - 0.04, jointY + 0.04, jointZ - 0.04),
+        vec3(jointX + 0.04, jointY + 0.04, jointZ - 0.04),
+        vec3(jointX + 0.04, jointY - 0.04, jointZ - 0.04)
+	];
+
+	console.log("vertices is: " + vertices);
+
+	// a-b-c-a-c-d
+	var verticesOfJoints = [1, 0, 3, 1, 3, 2,
+	                        2, 3, 7, 2, 7, 6,
+							3, 0, 4, 3, 4, 7, 
+							6, 5, 1, 6, 1, 2,
+							4, 5, 6, 4, 6, 7,  
+							5, 4, 0, 5, 0, 1 ];
+
+	// The joint will be a solid cube of red:
+	var jointColor = vec4(1.0, 0.0, 0.0, 1.0);
+
+	// Add all vertices to be rendered:
+	for(var i = 0; i < verticesOfJoints.length; i++) {
+		points.push(vertices[verticesOfJoints[i]]);
+		colors.push(jointColor);
+	} // End for 
+														
+
+	// For each joint, there are 36 vertices to render:
+	NumVertices += 36;	
+
+	/*
+	jointside(1, 0, 3, 2);
+	jointside(2, 3, 7, 6);
+	jointside(3, 0, 4, 7);
+	jointside(6, 5, 1, 2);
+	jointside(4, 5, 6, 7);
+	jointside(5, 4, 0, 1);
+	*/
+} // End function drawJoint()
+
+// This function draws a link.  A link is represented by a rectangular prism:
+function drawLink() {
+
+} // End function drawLink()
+
 function colorCube()
 {
     quad( 1, 0, 3, 2 );
@@ -263,17 +330,18 @@ function colorCube()
     quad( 5, 4, 0, 1 );
 }
 
+
 function quad(a, b, c, d) 
 {
     var vertices = [
-        vec3( -0.5, -0.5,  0.5 ),
-        vec3( -0.5,  0.5,  0.5 ),
-        vec3(  0.5,  0.5,  0.5 ),
-        vec3(  0.5, -0.5,  0.5 ),
-        vec3( -0.5, -0.5, -0.5 ),
-        vec3( -0.5,  0.5, -0.5 ),
-        vec3(  0.5,  0.5, -0.5 ),
-        vec3(  0.5, -0.5, -0.5 )
+        vec3( -0.1, -0.1,  0.1 ),
+        vec3( -0.1,  0.1,  0.1 ),
+        vec3(  0.1,  0.1,  0.1 ),
+        vec3(  0.1, -0.1,  0.1 ),
+        vec3( -0.1, -0.1, -0.1 ),
+        vec3( -0.1,  0.1, -0.1 ),
+        vec3(  0.1,  0.1, -0.1 ),
+        vec3(  0.1, -0.1, -0.1 )
     ];
 
     var vertexColors = [
@@ -330,3 +398,4 @@ function render() {
     //requestAnimFrame( render );
 } // End function render()
 
+/*** END SECTION DRAWING FUNCTIONS ***/

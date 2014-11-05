@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/4/14 - 8:06 PM
+ * Last Updated: 11/5/14 - 5:52 PM
  */ 
 
 var canvas;
@@ -83,6 +83,85 @@ function addHTMLElement(type) {
 	// Add the new input element into the page:
 	genericItem.appendChild(element); 
 } // End function addHTMLElement()
+
+/*
+ * The joint color is set by using the "newJointColor" HTML element.  We need
+ * our joint color to be represented (in RGB) from a value of 0.0 to 1.0 for
+ * each of the RGB components.  However, the HTML element will return a color
+ * using Hexadecimal values from #000000 (black) - #FFFFFF (white).  The
+ * following functions will facilitate in converting hexadecimal colors to
+ * the appropriate decimal values.
+ */
+
+/* 
+ * This function calculates the decimal values of a given hex RGB component.
+ * 
+ * Parameters: hexValue - The entire hex string rep. the color.
+ *             color - The color to look for (either "red", "green", "blue")
+ *
+ * Returns: decimal value of the corresponding hex color.    
+ *
+ * TESTED/VALIDATED 11/5/14
+ */
+function colorHexToDec(hexValue, color) {
+	
+	/*
+	 * hexValue is a string in the following form: #ffffff.  We must ignore
+	 * hexValue[0] since it's the "#" sign.
+	 */
+
+	// We have 3 cases: "red", "green", "blue":
+	switch(color) {
+		
+		case "red":
+			return parseInt(hexValue.substring(1, 3), 16);
+			break;
+		case "green":
+			return parseInt(hexValue.substring(3, 5), 16);
+			break;
+		case "blue":
+			return parseInt(hexValue.substring(5, 7), 16);
+			break;
+
+		// We should never reach this state:
+		default:
+			console.log("ERROR!");
+			return -9001;
+			break;
+			
+	} // End switch()
+} // End function colorHexToDec()
+
+/*
+ * This function converts a hex RGB color value into a vec4 object 
+ * representation.
+ *
+ * Parameters: hexValue (the hex RGB color to convert)
+ * Returns: vec4() of all the hex colors:
+ *
+ * TESTED/VALIDATED 11/5/14
+ */
+function convertColor(hexValue) {
+	
+	// Get the decimal representations of each of the RGB components:
+	var redValue = colorHexToDec(hexValue, "red");
+	var greenValue = colorHexToDec(hexValue, "green");
+	var blueValue = colorHexToDec(hexValue, "blue");
+
+	/*
+	 * We need to convert the colors from values ranging from 0 - 255
+	 * to values from 0.0 - 1.0.  Using the classic linear equation
+	 * y = mx + b, this equation is becomes y = x/255, where x is the
+	 * value from 0 - 255 and y is the value from 0.0 to 1.0.
+	 */
+	var convertedRed = redValue / 255.0;
+	var convertedGreen = greenValue / 255.0;
+	var convertedBlue = blueValue / 255.0;
+
+	// Construct and return the vec4() object containing these values:
+	return vec4(convertedRed, convertedGreen, convertedBlue, 1.0);
+
+} // End function convertColor()
 
 
 /*

@@ -88,7 +88,7 @@ Last Updated: 11/4/14 - 7:24 PM
 	<script type="text/javascript" src="simulator.js"></script>
 
 	<body>
-		<canvas id="gl-canvas" width="512" height="512">
+		<canvas id="gl-canvas" width="1024" height="1024">
 			Oops ... your browser doesn't support the HTML5 canvas element
 		</canvas>
 	
@@ -106,15 +106,23 @@ Last Updated: 11/4/14 - 7:24 PM
 
 			<h1 id="joints">Joints</h1>
 
+			<input id="newJointX" type="number">New Joint's X-Position</input>
+			<input id="newJointY" type="number">New Joint's Y-Position</input>
+			<input id="newJointZ" type="number">New Joint's Z-Position</input>
+			<input id="newJointColor" type="color">New Joint's Color</input>
+
 			<form>
+
+				<!--
 				<select name="element">
 					<option value="button">Button</option>
 					<option value="text">Textbox</option>
 					<option value="radio">Radio</option>
 					<option value="range">Range</option>
 				</select>
+				-->
 
-				<input type="button" value="Add Joint" onclick="addHTMLElement(document.forms[0].element.value)"/>
+				<input type="button" value="Add Joint" onclick="addHTMLElement('range')"/>
 		
 				<span id="nonexistent">&nbsp;</span>
 			</form>

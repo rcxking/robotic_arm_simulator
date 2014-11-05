@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/4/14 - 7:24 PM
+ * Last Updated: 11/4/14 - 8:06 PM
  */ 
 
 var canvas;
@@ -101,9 +101,9 @@ window.onload = function init()
  	//drawJoint(0.5, 0.0, 0.0);
 	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
 	joints.push([0.0, 0.0, 0.0, 2]);
-	joints.push([0.5, 0.0, 0.0, 1]);
+	joints.push([1.0, 0.0, 0.0, 1]);
 	drawAllJoints(joints);
-	drawLink(0.0, 0.0, 0.0, 0.5, 0.0, 0.0);
+	drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -273,6 +273,11 @@ function drawAllJoints(listOfJoints) {
 		drawJoint(listOfJoints[i][0], listOfJoints[i][1], listOfJoints[i][2], listOfJoints[i][3]);
 	} // End for
 } // End function drawAllJoints()
+
+// This function adds a joint to be rendered:
+function addJoint(jointParameters) {
+
+} // End function addJoint()
 
 // This function draws a joint.  A joint is represented as a cube.
 function drawJoint(jointX, jointY, jointZ, color) {

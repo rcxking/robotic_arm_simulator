@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/5/14 - 5:52 PM
+ * Last Updated: 11/5/14 - 6:40 PM
  */ 
 
 var canvas;
@@ -61,27 +61,34 @@ var projectionMatrixLoc;
 var hasLoaded = 0;
 
 /*
- * This function allows new HTML elements to be added to the simulator webpage.
+ * This function allows new joint elements to be added to the simulator webpage.
  * This function is used to create new slider elements when a new robot arm
- * joint is created.
+ * joint is created.  Additionally, the new joint data is pushed to the vectors
+ * for rendering:   
  *
  * TESTED/VERTIFIED
  */
-function addHTMLElement(type) {
+function addJointCallback() {
 
-	// We will be using the DOM's createElement() function: 
-	var element = document.createElement("input");
+	/*
+	 * We will be using the DOM's createElement() function to create a slider 
+	 * element to allow the user to control a single joint:
+	 */
+	var sliderElement = document.createElement("input");
 
+	var type ="range";
 	// Set the attributes of this new input element:
-	element.setAttribute("type", type);
-	element.setAttribute("value", type);
-	element.setAttribute("name", type);
+	sliderElement.setAttribute("type", type);
+	sliderElement.setAttribute("value", type);
+	sliderElement.setAttribute("name", type);
 
 	// We need to get a generic item in the DOM to append the new element:
 	var genericItem = document.getElementById("nonexistent");
 	
 	// Add the new input element into the page:
-	genericItem.appendChild(element); 
+	genericItem.appendChild(sliderElement); 
+	//genericItem.appendChild("<br/>");
+
 } // End function addHTMLElement()
 
 /*
@@ -111,8 +118,7 @@ function colorHexToDec(hexValue, color) {
 	 */
 
 	// We have 3 cases: "red", "green", "blue":
-	switch(color) {
-		
+	switch(color) {		
 		case "red":
 			return parseInt(hexValue.substring(1, 3), 16);
 			break;
@@ -168,8 +174,7 @@ function convertColor(hexValue) {
  * Onload - This function is executed when the browser is opened.  Equivalent
  * to int main() in C.
  */
-window.onload = function init()
-{
+window.onload = function init() {
 
     canvas = document.getElementById( "gl-canvas" );
     
@@ -236,6 +241,13 @@ window.onload = function init()
         theta[axis] = document.getElementById("cubeAngleZ").value;
         render();
     };
+
+	document.getElementById("newJoint").onclick = function() {
+		NumVertices = 0;
+		addJointCallback();
+		drawAllJoints(joints);
+		render();
+	};
 
 
 	/** END REMOVE THIS SECTION **/
@@ -352,11 +364,6 @@ function drawAllJoints(listOfJoints) {
 		drawJoint(listOfJoints[i][0], listOfJoints[i][1], listOfJoints[i][2], listOfJoints[i][3]);
 	} // End for
 } // End function drawAllJoints()
-
-// This function adds a joint to be rendered:
-function addJoint(jointParameters) {
-
-} // End function addJoint()
 
 // This function draws a joint.  A joint is represented as a cube.
 function drawJoint(jointX, jointY, jointZ, color) {

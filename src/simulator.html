@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 11/5/14 - 5:52 PM
+Last Updated: 11/5/14 - 6:40 PM
 -->
 
 
@@ -108,12 +108,13 @@ Last Updated: 11/5/14 - 5:52 PM
 
 			<input id="newJointX" type="number">New Joint's X-Position</input>
 			<input id="newJointY" type="number">New Joint's Y-Position</input>
-			<input id="newJointZ" type="number">New Joint's Z-Position</input>
-			<input id="newJointColor" type="color">New Joint's Color</input>
+			<input id="newJointZ" type="number">New Joint's Z-Position</input><br/>
+			<input id="jointRotAxis" type="string">New Joint's Rotation Axis</input><br/>
+			<input id="newJointColor" type="color">New Joint's Color</input><br/>
 
 			<form>
 
-				<input type="button" value="Add Joint" onclick="addHTMLElement('range')"/>
+				<input id="newJoint" type="button" value="Add Joint"/> <!--"addHTMLElement('range')"/>-->
 		
 				<span id="nonexistent">&nbsp;</span>
 			</form>

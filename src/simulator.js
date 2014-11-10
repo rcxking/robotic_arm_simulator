@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/5/14 - 6:40 PM
+ * Last Updated: 11/9/14 - 9:21 PM
  */ 
 
 var canvas;
@@ -26,6 +26,18 @@ var joints = [];
  * P01.
  */
 var links = [];
+
+/*
+ * This vector holds the joint data for rendering with the GPU.
+ *
+ * The vector consists of 4 arrays in the following form:
+ * 
+ * var jointData = [ <1>, <2>, <3>, <4> ]
+ * where:
+ * <1>: This array contains an array containing the vertices in this joint.
+ * <2>: This array contains a 3-element vector depicting the rotation axis of this joint.
+ * <3>: This array contains the 3D rotation matrix from the ith - 1 to the ith joint
+ */
 
 // Variable to keep track of the number of joints on the arm:
 var numberOfJoints = 0; 
@@ -70,6 +82,8 @@ var hasLoaded = 0;
  */
 function addJointCallback() {
 
+	console.log("Now Adding New Joint");
+
 	/*
 	 * We will be using the DOM's createElement() function to create a slider 
 	 * element to allow the user to control a single joint:
@@ -81,13 +95,42 @@ function addJointCallback() {
 	sliderElement.setAttribute("type", type);
 	sliderElement.setAttribute("value", type);
 	sliderElement.setAttribute("name", type);
-
+	
 	// We need to get a generic item in the DOM to append the new element:
 	var genericItem = document.getElementById("nonexistent");
 	
 	// Add the new input element into the page:
 	genericItem.appendChild(sliderElement); 
-	//genericItem.appendChild("<br/>");
+	
+	// Get the values of the arguments for the joints:
+	var newJointXPos = document.getElementById("newJointX").value;
+	var newJointYPos = document.getElementById("newJointY").value;
+	var newJointZPos = document.getElementById("newJointZ").value;
+	
+	var newJointRotXAxis = document.getElementById("newJointRotXAxis").value;
+	var newJointRotYAxis = document.getElementById("newJointRotYAxis").value;
+	var newJointRotZAxis = document.getElementById("newJointRotZAxis").value;
+	
+	var newJointColor = document.getElementById("newJointColor").value;
+	
+	console.log("newJointXPos: " + newJointXPos);
+	console.log("newJointYPos: " + newJointYPos);
+	console.log("newJointZPos: " + newJointZPos);
+	
+	console.log("newJointRotXAxis: " + newJointRotXAxis);
+	console.log("newJointRotYAxis: " + newJointRotYAxis);
+	console.log("newJointRotZAxis: " + newJointRotZAxis);
+	
+	console.log("newJointColor: " + newJointColor);
+	
+	// Convert the newJointColor (in hex) to a vec4 containing the RGB colors for the joint (VALIDATED):
+	var convertedJointColor = convertColor(newJointColor);
+	console.log("convertedJointColor is: " + convertedJointColor);
+	
+	// Create the joint:
+	//drawJoint(newJointXPos, newJointYPos, newJointZPos, convertedJointColor);
+	joints.push([newJointXPos, newJointYPos, newJointZPos, convertedJointColor]);
+	
 
 } // End function addHTMLElement()
 
@@ -184,8 +227,8 @@ window.onload = function init() {
     //colorCube();
  	//drawJoint(0.5, 0.0, 0.0);
 	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
-	joints.push([0.0, 0.0, 0.0, 2]);
-	joints.push([1.0, 0.0, 0.0, 1]);
+	joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
+	joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
 	drawAllJoints(joints);
 	drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
 
@@ -246,6 +289,8 @@ window.onload = function init() {
 		NumVertices = 0;
 		addJointCallback();
 		drawAllJoints(joints);
+		
+		console.log("after the newJointButton was clicked, before rendering, NumVertices is: " + NumVertices);
 		render();
 	};
 
@@ -253,7 +298,7 @@ window.onload = function init() {
 	/** END REMOVE THIS SECTION **/
         
 	if(hasLoaded === 0) {
-		console.log("DEBUG ONLY - I have rendered!");
+		//console.log("DEBUG ONLY - I have rendered!");
 		points.push(originFrameX);
 		colors.push([0.0, 0.0, 0.0, 1.0]);
 		render();
@@ -365,13 +410,16 @@ function drawAllJoints(listOfJoints) {
 	} // End for
 } // End function drawAllJoints()
 
-// This function draws a joint.  A joint is represented as a cube.
+/*
+ * This function draws a joint.  A joint is represented as a cube.  The color is represented as a 
+ * vec4 RGB vector.
+ */
 function drawJoint(jointX, jointY, jointZ, color) {
 
-	console.log("Now calling drawJoint() at:");
-	console.log("jointX: " + jointX);
-	console.log("jointY: " + jointY);
-	console.log("jointZ: " + jointZ);
+	//console.log("Now calling drawJoint() at:");
+	//console.log("jointX: " + jointX);
+	//console.log("jointY: " + jointY);
+	//console.log("jointZ: " + jointZ);
 	// The vertices of the joint:
 	var vertices = [
 		vec3(jointX	- 0.04, jointY - 0.04, jointZ + 0.04),
@@ -384,7 +432,7 @@ function drawJoint(jointX, jointY, jointZ, color) {
         vec3(jointX + 0.04, jointY - 0.04, jointZ - 0.04)
 	];
 
-	console.log("vertices is: " + vertices);
+	//console.log("vertices is: " + vertices);
 
 	// a-b-c-a-c-d
 	var verticesOfJoints = [1, 0, 3, 1, 3, 2,
@@ -404,7 +452,8 @@ function drawJoint(jointX, jointY, jointZ, color) {
 	// Add all vertices to be rendered:
 	for(var i = 0; i < verticesOfJoints.length; i++) {
 		points.push(vertices[verticesOfJoints[i]]);
-		colors.push(jointColors[color]);
+		//colors.push(jointColors[color]);
+		colors.push(color);
 	} // End for 
 														
 	// For each joint, there are 36 vertices to render:

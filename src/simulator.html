@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 11/5/14 - 6:40 PM
+Last Updated: 11/9/14 - 9:13 PM
 -->
 
 
@@ -29,6 +29,9 @@ Last Updated: 11/5/14 - 6:40 PM
 		// Camera Positioning Matrices:
 		uniform mat4 modelViewMatrix;
 		uniform mat4 projectionMatrix;
+		
+		// All the joint data is stored in this vector:
+		uniform vec4 jointData;
 		
 		// This attribute identifies which rotation matrices to apply to this point:
 		
@@ -109,7 +112,10 @@ Last Updated: 11/5/14 - 6:40 PM
 			<input id="newJointX" type="number">New Joint's X-Position</input>
 			<input id="newJointY" type="number">New Joint's Y-Position</input>
 			<input id="newJointZ" type="number">New Joint's Z-Position</input><br/>
-			<input id="jointRotAxis" type="string">New Joint's Rotation Axis</input><br/>
+			<input id="newJointRotXAxis" type="string">New Joint's Rotation Axis (X)</input><br/>
+			<input id="newJointRotYAxis" type="string">New Joint's Rotation Axis (Y)</input><br/>
+			<input id="newJointRotZAxis" type="string">New Joint's Rotation Axis (Z)</input><br/>
+			
 			<input id="newJointColor" type="color">New Joint's Color</input><br/>
 
 			<form>

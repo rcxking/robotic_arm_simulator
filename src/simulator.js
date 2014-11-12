@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/9/14 - 9:21 PM
+ * Last Updated: 11/11/14 - 8:30 PM
  */ 
 
 var canvas;
@@ -103,13 +103,13 @@ function addJointCallback() {
 	genericItem.appendChild(sliderElement); 
 	
 	// Get the values of the arguments for the joints:
-	var newJointXPos = document.getElementById("newJointX").value;
-	var newJointYPos = document.getElementById("newJointY").value;
-	var newJointZPos = document.getElementById("newJointZ").value;
+	var newJointXPos = Number(document.getElementById("newJointX").value);
+	var newJointYPos = Number(document.getElementById("newJointY").value);
+	var newJointZPos = Number(document.getElementById("newJointZ").value);
 	
-	var newJointRotXAxis = document.getElementById("newJointRotXAxis").value;
-	var newJointRotYAxis = document.getElementById("newJointRotYAxis").value;
-	var newJointRotZAxis = document.getElementById("newJointRotZAxis").value;
+	var newJointRotXAxis = Number(document.getElementById("newJointRotXAxis").value);
+	var newJointRotYAxis = Number(document.getElementById("newJointRotYAxis").value);
+	var newJointRotZAxis = Number(document.getElementById("newJointRotZAxis").value);
 	
 	var newJointColor = document.getElementById("newJointColor").value;
 	
@@ -227,10 +227,10 @@ window.onload = function init() {
     //colorCube();
  	//drawJoint(0.5, 0.0, 0.0);
 	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
-	joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
-	joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
-	drawAllJoints(joints);
-	drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+	//joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
+	//joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
+	//drawAllJoints(joints);
+	//drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -286,11 +286,18 @@ window.onload = function init() {
     };
 
 	document.getElementById("newJoint").onclick = function() {
-		NumVertices = 0;
+		//NumVertices = 0;
 		addJointCallback();
 		drawAllJoints(joints);
 		
+		gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
+		
+		gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
+		
 		console.log("after the newJointButton was clicked, before rendering, NumVertices is: " + NumVertices);
+		console.log("Before rendering, joints.length is: " + joints.length);
 		render();
 	};
 
@@ -299,8 +306,8 @@ window.onload = function init() {
         
 	if(hasLoaded === 0) {
 		//console.log("DEBUG ONLY - I have rendered!");
-		points.push(originFrameX);
-		colors.push([0.0, 0.0, 0.0, 1.0]);
+		//points.push(originFrameX);
+		//colors.push([0.0, 0.0, 0.0, 1.0]);
 		render();
 		hasLoaded = 1;
 	} // End if
@@ -416,10 +423,10 @@ function drawAllJoints(listOfJoints) {
  */
 function drawJoint(jointX, jointY, jointZ, color) {
 
-	//console.log("Now calling drawJoint() at:");
-	//console.log("jointX: " + jointX);
-	//console.log("jointY: " + jointY);
-	//console.log("jointZ: " + jointZ);
+	console.log("Now calling drawJoint() at:");
+	console.log("jointX: " + jointX);
+	console.log("jointY: " + jointY);
+	console.log("jointZ: " + jointZ);
 	// The vertices of the joint:
 	var vertices = [
 		vec3(jointX	- 0.04, jointY - 0.04, jointZ + 0.04),
@@ -432,7 +439,7 @@ function drawJoint(jointX, jointY, jointZ, color) {
         vec3(jointX + 0.04, jointY - 0.04, jointZ - 0.04)
 	];
 
-	//console.log("vertices is: " + vertices);
+	console.log("vertices is: " + vertices);
 
 	// a-b-c-a-c-d
 	var verticesOfJoints = [1, 0, 3, 1, 3, 2,

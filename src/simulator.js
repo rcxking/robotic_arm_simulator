@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/11/14 - 8:30 PM
+ * Last Updated: 11/17/14 - 9:40 PM
  */ 
 
 var canvas;
@@ -37,8 +37,14 @@ var links = [];
  * <1>: This array contains an array containing the vertices in this joint.
  * <2>: This array contains a 3-element vector depicting the rotation axis of this joint.
  * <3>: This array contains the 3D rotation matrix from the ith - 1 to the ith joint
+ * <4>: This array contains the color of the ith joint.
  */
-
+ var jointData = [];
+ jointData.push([]);
+ jointData.push([]);
+ jointData.push([]);
+ jointData.push([]);
+ 
 // Variable to keep track of the number of joints on the arm:
 var numberOfJoints = 0; 
 
@@ -128,7 +134,6 @@ function addJointCallback() {
 	console.log("convertedJointColor is: " + convertedJointColor);
 	
 	// Create the joint:
-	//drawJoint(newJointXPos, newJointYPos, newJointZPos, convertedJointColor);
 	joints.push([newJointXPos, newJointYPos, newJointZPos, convertedJointColor]);
 	
 
@@ -224,14 +229,18 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    //colorCube();
+	// Test to draw coordinate axes:
+	drawLink(0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006);
+	drawLink(0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006);
+	drawLink(0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006);
+    
  	//drawJoint(0.5, 0.0, 0.0);
 	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
-	//joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
-	//joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
-	//drawAllJoints(joints);
-	//drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-
+	joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
+	joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
+	drawAllJoints(joints);
+	drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01);
+	
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
     
@@ -306,8 +315,6 @@ window.onload = function init() {
         
 	if(hasLoaded === 0) {
 		//console.log("DEBUG ONLY - I have rendered!");
-		//points.push(originFrameX);
-		//colors.push([0.0, 0.0, 0.0, 1.0]);
 		render();
 		hasLoaded = 1;
 	} // End if
@@ -427,16 +434,21 @@ function drawJoint(jointX, jointY, jointZ, color) {
 	console.log("jointX: " + jointX);
 	console.log("jointY: " + jointY);
 	console.log("jointZ: " + jointZ);
+	
+	var scaledJointX = jointX / 4.0;
+	var scaledJointY = jointY / 4.0;
+	var scaledJointZ = jointZ / 4.0;
+	
 	// The vertices of the joint:
 	var vertices = [
-		vec3(jointX	- 0.04, jointY - 0.04, jointZ + 0.04),
-		vec3(jointX - 0.04, jointY + 0.04, jointZ + 0.04),
-        vec3(jointX + 0.04, jointY + 0.04, jointZ + 0.04),
-        vec3(jointX + 0.04, jointY - 0.04, jointZ + 0.04),
-        vec3(jointX - 0.04, jointY - 0.04, jointZ - 0.04),
-        vec3(jointX - 0.04, jointY + 0.04, jointZ - 0.04),
-        vec3(jointX + 0.04, jointY + 0.04, jointZ - 0.04),
-        vec3(jointX + 0.04, jointY - 0.04, jointZ - 0.04)
+		vec3(scaledJointX - 0.04, scaledJointY - 0.04, scaledJointZ + 0.04),
+		vec3(scaledJointX - 0.04, scaledJointY + 0.04, scaledJointZ + 0.04),
+        vec3(scaledJointX + 0.04, scaledJointY + 0.04, scaledJointZ + 0.04),
+        vec3(scaledJointX + 0.04, scaledJointY - 0.04, scaledJointZ + 0.04),
+        vec3(scaledJointX - 0.04, scaledJointY - 0.04, scaledJointZ - 0.04),
+        vec3(scaledJointX - 0.04, scaledJointY + 0.04, scaledJointZ - 0.04),
+        vec3(scaledJointX + 0.04, scaledJointY + 0.04, scaledJointZ - 0.04),
+        vec3(scaledJointX + 0.04, scaledJointY - 0.04, scaledJointZ - 0.04)
 	];
 
 	console.log("vertices is: " + vertices);
@@ -477,22 +489,31 @@ function drawJoint(jointX, jointY, jointZ, color) {
 } // End function drawJoint()
 
 // This function draws a link.  A link is represented by a rectangular prism:
+// Use 0.01 for a joint link.
 function drawLink(startX, startY, startZ,
-                  endX,   endY,   endZ) {
+                  endX,   endY,   endZ, widthOfLink) {
 
 	// Calculate the length of this link:
 	//var linkLength = Math.sqrt((  
 
+	// Scaled link variables for a 4 foot long robot arm:
+	var scaledStartX = startX / 4.0;
+	var scaledStartY = startY / 4.0;
+	var scaledStartZ = startZ / 4.0;
+	var scaledEndX = endX / 4.0;
+	var scaledEndY = endY / 4.0;
+	var scaledEndZ = endZ / 4.0;
+	
 	// The vertices of the link:
 	var vertices = [
-        vec3(startX - 0.01, startY - 0.01, startZ + 0.01),
-        vec3(startX - 0.01, startY + 0.01, startZ + 0.01),
-        vec3(endX + 0.01, endY + 0.01, endZ + 0.01),
-        vec3(endX + 0.01, endY - 0.01, endZ + 0.01),
-        vec3(startX - 0.01, startY - 0.01, startZ - 0.01),
-        vec3(startX - 0.01, startY + 0.01, startZ - 0.01),
-        vec3(endX + 0.01, endY + 0.01, endZ - 0.01),
-        vec3(endX + 0.01, endY - 0.01, endZ - 0.01)
+        vec3(scaledStartX - widthOfLink, scaledStartY - widthOfLink, scaledStartZ + widthOfLink),
+        vec3(scaledStartX - widthOfLink, scaledStartY + widthOfLink, scaledStartZ + widthOfLink),
+        vec3(scaledEndX + widthOfLink, scaledEndY + widthOfLink, scaledEndZ + widthOfLink),
+        vec3(scaledEndX + widthOfLink, scaledEndY - widthOfLink, scaledEndZ + widthOfLink),
+        vec3(scaledStartX - widthOfLink, scaledStartY - widthOfLink, scaledStartZ - widthOfLink),
+        vec3(scaledStartX - widthOfLink, scaledStartY + widthOfLink, scaledStartZ - widthOfLink),
+        vec3(scaledEndX + widthOfLink, scaledEndY + widthOfLink, scaledEndZ - widthOfLink),
+        vec3(scaledEndX + widthOfLink, scaledEndY - widthOfLink, scaledEndZ - widthOfLink)
     ];
 
 	// This link will be colored black:

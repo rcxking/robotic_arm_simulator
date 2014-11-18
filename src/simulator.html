@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 11/11/14 - 8:30 PM
+Last Updated: 11/17/14 - 9:40 PM
 -->
 
 
@@ -99,9 +99,10 @@ Last Updated: 11/11/14 - 8:30 PM
 
 		<!-- REMOVE THIS CODE WHEN IMPLEMENTING ROBOT -->
 
-		<input id="cubeAngleX" type="range" min="0" max="400" value="0" step="0.01">Adjust Cube Angle (X-Axis)</input>
-		<input id="cubeAngleY" type="range" min="0" max="400" value="0" step="0.01">Adjust Cube Angle (Y-Axis)</input>
-		<input id="cubeAngleZ" type="range" min="0" max="400" value="0" step="0.01">Adjust Cube Angle (Z-Axis)</input>
+		<!-- Angle values are in degrees -->
+		<input id="cubeAngleX" type="range" min="0" max="360" value="0" step="1">Adjust Cube Angle (X-Axis)</input>
+		<input id="cubeAngleY" type="range" min="0" max="360" value="0" step="1">Adjust Cube Angle (Y-Axis)</input>
+		<input id="cubeAngleZ" type="range" min="0" max="360" value="0" step="1">Adjust Cube Angle (Z-Axis)</input>
 		<!-- END SECTION TO REMOVE -->
 
 		<!-- Joints Section--> 
@@ -109,9 +110,9 @@ Last Updated: 11/11/14 - 8:30 PM
 
 			<h1 id="joints">Joints</h1>
 
-			<input id="newJointX" type="number">New Joint's X-Position</input>
-			<input id="newJointY" type="number">New Joint's Y-Position</input>
-			<input id="newJointZ" type="number">New Joint's Z-Position</input><br/>
+			<input id="newJointX" type="number">New Joint's X-Position (feet)</input>
+			<input id="newJointY" type="number">New Joint's Y-Position (feet)</input>
+			<input id="newJointZ" type="number">New Joint's Z-Position (feet)</input><br/>
 			<input id="newJointRotXAxis" type="string">New Joint's Rotation Axis (X)</input><br/>
 			<input id="newJointRotYAxis" type="string">New Joint's Rotation Axis (Y)</input><br/>
 			<input id="newJointRotZAxis" type="string">New Joint's Rotation Axis (Z)</input><br/>

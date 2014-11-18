@@ -1,4 +1,4 @@
-Robotic Arm Simulator Design Choices - Last Updated: 11/4/14 - 5:58 PM 
+Robotic Arm Simulator Design Choices - Last Updated: 11/17/14 - 9:52 PM 
 -----------------------------------------------------------------------
 
 Project Requirements
@@ -9,12 +9,15 @@ the location of a joint.
 2) User interface should allow users to dynamically add/remove joints from a list.   
 
 3) When a joint is created, a new slider should appear that controls the joint's
-rotation from 0 to 2*pi radians. 
+rotation from 0 to 360 degrees. 
 
-4) Robot's forward and inverse kinematics should be displayed.   
+4) Robot's forward kinematics should be displayed.   
 
 5) The canvas is 512px x 512px.  The camera is viewing from (0.1, 0.1, 0.1), so 
 there is an orthogonal view of the robot arm.  The
+
+6) Industrial robot arms are about 4 ft. at zero configuration (stretched out).  The WebGL canvas 
+spans from -1 to 1 units.  Therefore, the scaling factor should be 4.
 
 
 gl.TRIANGLES:

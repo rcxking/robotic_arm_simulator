@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/17/14 - 9:40 PM
+ * Last Updated: 11/19/14 - 5:49 PM
  */ 
 
 var canvas;
@@ -119,6 +119,7 @@ function addJointCallback() {
 	
 	var newJointColor = document.getElementById("newJointColor").value;
 	
+	/*
 	console.log("newJointXPos: " + newJointXPos);
 	console.log("newJointYPos: " + newJointYPos);
 	console.log("newJointZPos: " + newJointZPos);
@@ -126,6 +127,7 @@ function addJointCallback() {
 	console.log("newJointRotXAxis: " + newJointRotXAxis);
 	console.log("newJointRotYAxis: " + newJointRotYAxis);
 	console.log("newJointRotZAxis: " + newJointRotZAxis);
+	*/
 	
 	console.log("newJointColor: " + newJointColor);
 	
@@ -230,16 +232,25 @@ window.onload = function init() {
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
 	// Test to draw coordinate axes:
-	drawLink(0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006);
-	drawLink(0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006);
-	drawLink(0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006);
+	//drawLink(0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006, 1);
+	//drawLink(0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006, 2);
+	//drawLink(0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006, 3);
     
  	//drawJoint(0.5, 0.0, 0.0);
 	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
 	joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
 	joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
+	
+	// Origin Coordinate Frame:
+	links.push([0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006, 1]);
+	links.push([0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006, 2]);
+	links.push([0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006, 3]);
+	
+	links.push([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0]);
+	
 	drawAllJoints(joints);
-	drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01);
+	drawAllLinks(links);
+	// drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0);
 	
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -417,6 +428,14 @@ function drawZAxis() {
 
 } // End function drawZAxis()
 
+// This function takes a list of all the links to draw and draws all of them:
+function drawAllLinks(listOfLinks) {
+	for(var i = 0; i < listOfLinks.length; i++) {
+		drawLink(listOfLinks[i][0], listOfLinks[i][1], listOfLinks[i][2], listOfLinks[i][3], 
+		         listOfLinks[i][4], listOfLinks[i][5], listOfLinks[i][6], listOfLinks[i][7]);
+	} // End for
+} // End function drawAllLinks()
+
 // This function takes a list of joint parameters and draws all of them:
 function drawAllJoints(listOfJoints) {
 	for(var i = 0; i < listOfJoints.length; i++) {
@@ -491,11 +510,8 @@ function drawJoint(jointX, jointY, jointZ, color) {
 // This function draws a link.  A link is represented by a rectangular prism:
 // Use 0.01 for a joint link.
 function drawLink(startX, startY, startZ,
-                  endX,   endY,   endZ, widthOfLink) {
-
-	// Calculate the length of this link:
-	//var linkLength = Math.sqrt((  
-
+                  endX,   endY,   endZ, widthOfLink, color) {
+				  
 	// Scaled link variables for a 4 foot long robot arm:
 	var scaledStartX = startX / 4.0;
 	var scaledStartY = startY / 4.0;
@@ -516,8 +532,18 @@ function drawLink(startX, startY, startZ,
         vec3(scaledEndX + widthOfLink, scaledEndY - widthOfLink, scaledEndZ - widthOfLink)
     ];
 
-	// This link will be colored black:
-	var linkColor = vec4(0.0, 0.0, 0.0, 1.0);
+	/*
+	 * The link colors to choose from:
+	 * 0: Black
+	 * 1: Red
+	 * 2: Green
+	 * 3: Blue
+	 */
+	var linkColor = [vec4(0.0, 0.0, 0.0, 1.0),
+	                 vec4(1.0, 0.0, 0.0, 1.0),
+					 vec4(0.0, 1.0, 0.0, 1.0),
+					 vec4(0.0, 0.0, 1.0, 1.0)
+					 ];
 
 	var verticesOfJoints = [1, 0, 3, 1, 3, 2,
                             2, 3, 7, 2, 7, 6,
@@ -528,12 +554,12 @@ function drawLink(startX, startY, startZ,
 
     for(var i = 0; i < verticesOfJoints.length; i++) {
 		points.push(vertices[verticesOfJoints[i]]);
-		colors.push(linkColor);
+		colors.push(linkColor[color]);
 	} // End for
 
 	// There are 36 vertices to render:
-	NumVertices += 26;
-
+	NumVertices += 36;
+	
 } // End function drawLink()
 
 function colorCube()
@@ -597,7 +623,7 @@ function render() {
     gl.uniform3fv(thetaLoc, theta);
 
 	// We want the camera to look from the point (1, 1, 1):
-	modelViewMatrix = lookAt([0.1, 0.1, 0.1], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0]);
+	modelViewMatrix = lookAt([0.1, 0.1, 0.1], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
 	projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 	
 	// The modelViewMatrix (in column-major format) 

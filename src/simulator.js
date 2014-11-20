@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/19/14 - 5:49 PM
+ * Last Updated: 11/19/14 - 6:13 PM
  */ 
 
 var canvas;
@@ -60,6 +60,11 @@ var zAxis = 2;
 var axis = 0;
 var theta = [ 0, 0, 0 ];
 
+// All the rotation axes are stored in this array:
+var rotationAxes = [];
+// All the joint angles are stored in this array:
+var jointAngles = [];
+
 // Perspective Matrix Constants:
 var left = -1.0;
 var right = 1.0;
@@ -98,9 +103,18 @@ function addJointCallback() {
 
 	var type ="range";
 	// Set the attributes of this new input element:
-	sliderElement.setAttribute("type", type);
-	sliderElement.setAttribute("value", type);
-	sliderElement.setAttribute("name", type);
+	sliderElement.setAttribute("id", "temp");
+	sliderElement.setAttribute("type", "range");
+	sliderElement.setAttribute("min", "0");
+	sliderElement.setAttribute("max", "360");
+	sliderElement.setAttribute("value", "0");
+	sliderElement.setAttribute("step", "1");
+	
+	sliderElement.addEventListener("change", function() { 
+												console.log("onchange triggered!"); 
+												theta[0] = document.getElementById("temp").value;
+												render();
+											}, false);
 	
 	// We need to get a generic item in the DOM to append the new element:
 	var genericItem = document.getElementById("nonexistent");
@@ -117,19 +131,9 @@ function addJointCallback() {
 	var newJointRotYAxis = Number(document.getElementById("newJointRotYAxis").value);
 	var newJointRotZAxis = Number(document.getElementById("newJointRotZAxis").value);
 	
+	var rotationAxis = [newJointRotXAxis, newJointRotYAxis, newJointRotZAxis];
+	
 	var newJointColor = document.getElementById("newJointColor").value;
-	
-	/*
-	console.log("newJointXPos: " + newJointXPos);
-	console.log("newJointYPos: " + newJointYPos);
-	console.log("newJointZPos: " + newJointZPos);
-	
-	console.log("newJointRotXAxis: " + newJointRotXAxis);
-	console.log("newJointRotYAxis: " + newJointRotYAxis);
-	console.log("newJointRotZAxis: " + newJointRotZAxis);
-	*/
-	
-	console.log("newJointColor: " + newJointColor);
 	
 	// Convert the newJointColor (in hex) to a vec4 containing the RGB colors for the joint (VALIDATED):
 	var convertedJointColor = convertColor(newJointColor);
@@ -137,6 +141,35 @@ function addJointCallback() {
 	
 	// Create the joint:
 	joints.push([newJointXPos, newJointYPos, newJointZPos, convertedJointColor]);
+	
+	// Append the rotation axis:
+	rotationAxes.push([newJointRotXAxis, newJointRotYAxis, newJointRotZAxis]);
+	
+	// Add an event listener for this joint:
+	/*
+		document.getElementById("temp").addEventListener('onchange',
+		function(e) {
+		
+		
+			//axis = xAxis;
+			//theta[axis] = document.getElementById("temp").value;
+			//render();
+			
+			console.log("Event Handler Triggered!");
+		}
+		, false); 
+	*/
+	
+
+
+/*
+document.getElementById("cubeAngleX").onchange = function() {
+		//theta = document.getElementById("cubeAngle").value;
+		axis = xAxis;
+		theta[axis] = document.getElementById("cubeAngleX").value;
+		render();
+	};
+*/
 	
 
 } // End function addHTMLElement()
@@ -301,7 +334,8 @@ window.onload = function init() {
     document.getElementById("cubeAngleZ").onchange = function() {
         //theta = document.getElementById("cubeAngle").value;
         axis = zAxis;
-        theta[axis] = document.getElementById("cubeAngleZ").value;
+		// We have to negate the Z-Axis since the camera looks in the -Z direction:
+        theta[axis] = -1.0 * document.getElementById("cubeAngleZ").value;
         render();
     };
 
@@ -309,6 +343,7 @@ window.onload = function init() {
 		//NumVertices = 0;
 		addJointCallback();
 		drawAllJoints(joints);
+		drawAllLinks(links);
 		
 		gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
 		gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );

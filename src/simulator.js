@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/19/14 - 6:13 PM
+ * Last Updated: 11/22/14 - 3:58 PM
  */ 
 
 var canvas;
@@ -58,7 +58,7 @@ var yAxis = 1;
 var zAxis = 2;
 
 var axis = 0;
-var theta = [ 0, 0, 0 ];
+var theta = [ 0, 0, 0];
 
 // All the rotation axes are stored in this array:
 var rotationAxes = [];
@@ -82,6 +82,12 @@ var projectionMatrix;
 var projectionMatrixLoc;
 
 var hasLoaded = 0;
+
+/*
+ * For N joints, there are N - 1 joints.  This variable keeps track of whether we have
+ * more than 1 joint, as if we just have a single joint, no link should be drawn.
+ */
+var beginDrawingLinks = false;
 
 /*
  * This function allows new joint elements to be added to the simulator webpage.
@@ -144,34 +150,6 @@ function addJointCallback() {
 	
 	// Append the rotation axis:
 	rotationAxes.push([newJointRotXAxis, newJointRotYAxis, newJointRotZAxis]);
-	
-	// Add an event listener for this joint:
-	/*
-		document.getElementById("temp").addEventListener('onchange',
-		function(e) {
-		
-		
-			//axis = xAxis;
-			//theta[axis] = document.getElementById("temp").value;
-			//render();
-			
-			console.log("Event Handler Triggered!");
-		}
-		, false); 
-	*/
-	
-
-
-/*
-document.getElementById("cubeAngleX").onchange = function() {
-		//theta = document.getElementById("cubeAngle").value;
-		axis = xAxis;
-		theta[axis] = document.getElementById("cubeAngleX").value;
-		render();
-	};
-*/
-	
-
 } // End function addHTMLElement()
 
 /*
@@ -275,9 +253,11 @@ window.onload = function init() {
 	joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
 	
 	// Origin Coordinate Frame:
+	/*
 	links.push([0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006, 1]);
 	links.push([0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006, 2]);
 	links.push([0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006, 3]);
+	*/
 	
 	links.push([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0]);
 	
@@ -316,28 +296,47 @@ window.onload = function init() {
     thetaLoc = gl.getUniformLocation(program, "theta"); 
 	modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
+	
+	projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     	
 	document.getElementById("cubeAngleX").onchange = function() {
 		//theta = document.getElementById("cubeAngle").value;
-		axis = xAxis;
-		theta[axis] = document.getElementById("cubeAngleX").value;
+		//axis = xAxis;
+		theta[axis] = event.srcElement.value; //document.getElementById("cubeAngleX").value;
 		render();
 	};
 
 	document.getElementById("cubeAngleY").onchange = function() {
         //theta = document.getElementById("cubeAngle").value;
-        axis = yAxis;
-        theta[axis] = document.getElementById("cubeAngleY").value;
+        //axis = yAxis;
+        theta[axis] = event.srcElement.value; document.getElementById("cubeAngleY").value;
         render();
     };
 
     document.getElementById("cubeAngleZ").onchange = function() {
         //theta = document.getElementById("cubeAngle").value;
-        axis = zAxis;
+        //axis = zAxis;
 		// We have to negate the Z-Axis since the camera looks in the -Z direction:
-        theta[axis] = -1.0 * document.getElementById("cubeAngleZ").value;
+        theta[axis] = -1.0 * event.srcElement.value; //document.getElementById("cubeAngleZ").value;
         render();
     };
+	
+	// Joint 1 rotates around the X-Axis; Joint 2 rotates around the Y-Axis:
+	rotationAxes.push([1, 0, 0]);
+	rotationAxes.push([0, 1, 0]);
+	
+	document.getElementById("rotJoint1").onchange = function() {
+		axis = xAxis;
+		theta[axis] = event.srcElement.value;
+		render();
+	};
+	
+	document.getElementById("rotJoint2").onchange = function() {
+		axis = xAxis;
+		theta[axis] = event.srcElement.value;
+		render();
+	}; 
 
 	document.getElementById("newJoint").onclick = function() {
 		//NumVertices = 0;
@@ -355,15 +354,18 @@ window.onload = function init() {
 		console.log("Before rendering, joints.length is: " + joints.length);
 		render();
 	};
+	
+	render();
 
 
 	/** END REMOVE THIS SECTION **/
-        
+    /* 
 	if(hasLoaded === 0) {
 		//console.log("DEBUG ONLY - I have rendered!");
 		render();
 		hasLoaded = 1;
 	} // End if
+	*/
     //render();
 } // End function init()
 
@@ -531,6 +533,7 @@ function drawJoint(jointX, jointY, jointZ, color) {
 														
 	// For each joint, there are 36 vertices to render:
 	NumVertices += 36;	
+	//NumVertices = 36;
 
 	/*
 	jointside(1, 0, 3, 2);
@@ -594,6 +597,7 @@ function drawLink(startX, startY, startZ,
 
 	// There are 36 vertices to render:
 	NumVertices += 36;
+	//NumVertices = 36;
 	
 } // End function drawLink()
 
@@ -643,36 +647,52 @@ function quad(a, b, c, d)
     for ( var i = 0; i < indices.length; ++i ) {
         points.push( vertices[indices[i]] );
         colors.push( vertexColors[indices[i]] );
-    
-        // for solid colored faces use 
-        // colors.push(vertexColors[a]);
-        
-    }
+    } // End for
 }
+
+// Tests for joint 1 and joint 2 with 1 link betweek:
+function drawJoint1() {
+	var s = mat4(1, 0, 0, 0, 
+	             0, 1, 0, 0,
+				 0, 0, 1, 0,
+				 0, 0, 0, 1);
+	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
+	var t = mult(modelViewMatrix, instanceMatrix);
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+	gl.drawArrays(gl.TRIANGLES, 0, 36); //NumVertices);
+} // End function drawJoint1()
+
+function drawLink1() {
+
+} // End function drawLink1()
+
+function drawJoint2() {
+	var s = mat4(1, 0, 0, 0, 
+	             0, 1, 0, 0,
+				 0, 0, 1, 0,
+				 0, 0, 0, 1);
+	var instanceMatrix = mult(translate(1.0, 0.0, 0.0), s);
+	var t = mult(modelViewMatrix, instanceMatrix);
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+	gl.drawArrays(gl.TRIANGLES, 37, 72);
+} // End function drawJoint2()
+
+
 
 // Rendering function:
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    //theta[axis] += 2.0;
-    gl.uniform3fv(thetaLoc, theta);
+    //gl.uniform3fv(thetaLoc, theta);
 
 	// We want the camera to look from the point (1, 1, 1):
 	modelViewMatrix = lookAt([0.1, 0.1, 0.1], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
-	projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 	
-	// The modelViewMatrix (in column-major format) 
-	/*modelViewMatrix = mat4(1.0, 0, 0, 0, 
-	                       	   0, 1.0, 0, 0,
-   							   0, 0, 1.0, 0,
-							   0, 0, -0.3, 1.0);*/
-
-	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    gl.drawArrays( gl.TRIANGLES, 72, 36); //NumVertices );
 	
-    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+	requestAnimFrame(render);
 
-    //requestAnimFrame( render );
 } // End function render()
 
 /*** END SECTION DRAWING FUNCTIONS ***/

@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 11/19/14 - 5:48 PM
+Last Updated: 11/22/14 - 3:57 PM
 -->
 
 
@@ -23,8 +23,8 @@ Last Updated: 11/19/14 - 5:48 PM
 		/* 
 		 * Vertex Attributes:
 		 */
-		attribute  vec4 vPosition;
-		attribute  vec4 vColor;
+		attribute vec4 vPosition;
+		attribute vec4 vColor;
 		
 		// Camera Positioning Matrices:
 		uniform mat4 modelViewMatrix;
@@ -45,7 +45,7 @@ Last Updated: 11/19/14 - 5:48 PM
 			vec3 angles = radians( theta );
 			vec3 c = cos( angles );
 			vec3 s = sin( angles );
-
+			
 			// Remember: thse matrices are column-major
 			mat4 rx = mat4( 1.0,  0.0,  0.0, 0.0,
 							0.0,  c.x,  s.x, 0.0,
@@ -63,13 +63,9 @@ Last Updated: 11/19/14 - 5:48 PM
 							0.0,  0.0, 1.0, 0.0,
 							0.0,  0.0, 0.0, 1.0 );
 							
-			/*mat4 test = mat4(1.0, 0.0, 0.0, 0.0,
-			                 0.0, 1.0, 0.0, 0.0,
-							 0.0, 0.0, 1.0, 0.0,
-							 0.25, 0.25, 0.25, 1.0);*/
-
 			fColor = vColor;
-			gl_Position = projectionMatrix * modelViewMatrix *  rz * ry * rx * vPosition; // rz * ry * rx * vPosition;
+			//gl_Position = projectionMatrix * modelViewMatrix *  rz * ry * rx * vPosition; // rz * ry * rx * vPosition;
+			gl_Position = projectionMatrix * modelViewMatrix * vPosition;
 		} // End vertex shader function main()
 	</script>
 
@@ -103,6 +99,9 @@ Last Updated: 11/19/14 - 5:48 PM
 		<input id="cubeAngleX" type="range" min="0" max="360" value="0" step="1">Adjust Cube Angle (X-Axis)</input>
 		<input id="cubeAngleY" type="range" min="0" max="360" value="0" step="1">Adjust Cube Angle (Y-Axis)</input>
 		<input id="cubeAngleZ" type="range" min="0" max="360" value="0" step="1">Adjust Cube Angle (Z-Axis)</input>
+		
+		<input id="rotJoint1" type="range" min="0" max="360" value="0" step="1">Rotate Joint 1</input>
+		<input id="rotJoint2" type="range" min="0" max="360" value="0" step="1">Rotate Joint 2</input>
 		<!-- END SECTION TO REMOVE -->
 
 		<!-- Joints Section--> 
@@ -116,6 +115,7 @@ Last Updated: 11/19/14 - 5:48 PM
 			<input id="newJointRotXAxis" type="string">New Joint's Rotation Axis (X)</input><br/>
 			<input id="newJointRotYAxis" type="string">New Joint's Rotation Axis (Y)</input><br/>
 			<input id="newJointRotZAxis" type="string">New Joint's Rotation Axis (Z)</input><br/>
+		
 			
 			<input id="newJointColor" type="color">New Joint's Color</input><br/>
 

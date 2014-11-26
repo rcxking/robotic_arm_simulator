@@ -5,17 +5,29 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/26/14 - 12:41 PM
+ * Last Updated: 11/26/14 - 2:15 PM
  */ 
 
 var canvas;
 var gl;
 
+/***GLOBAL VARIABLES***/
+
+/*** Numericals ***/
+
 // The number of vertices to render:
 var NumVertices  = 0;
 
+/*** Arrays ***/
+
+// These arrays hold the points and their respective colors to render:
 var points = [];
 var colors = [];
+/***END SECTION GLOBAL VARIABLES***/
+
+
+
+
 
 // This array holds the Cartesian locations of all the rotational joints:
 var joints = [];
@@ -26,6 +38,9 @@ var joints = [];
  * P01.
  */
 var links = [];
+
+// This array holds the coordinate axis to render:
+var axes = [];
 
 /*
  * This vector holds the joint data for rendering with the GPU.
@@ -255,11 +270,11 @@ window.onload = function init() {
 	//joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
 	
 	// Origin Coordinate Frame:
-	/*
-	links.push([0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006, 1]);
-	links.push([0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006, 2]);
-	links.push([0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006, 3]);
-	*/
+	axes.push([0.0, 0.0, 0.0, 8.5, 0.0, 0.0, 0.05, 1]);
+	axes.push([0.0, 0.0, 0.0, 0.0, 8.5, 0.0, 0.05, 2]);
+	axes.push([0.0, 0.0, 0.0, 0.0, 0.0, 8.5, 0.05, 3]);
+	drawAllAxes(axes);
+	
 	
 	//links.push([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0]);
 	
@@ -268,7 +283,7 @@ window.onload = function init() {
 	
 	// Draw the reference cube:
 	referenceCube();
-	//colorCube();
+	
 	
 	// drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0);
 	
@@ -487,6 +502,14 @@ function drawAllJoints(listOfJoints) {
 	} // End for
 } // End function drawAllJoints()
 
+// This function takes a list of the coordinate axes to draw and draws all of them:
+function drawAllAxes(listOfAxes) {
+	for(var i = 0; i < listOfAxes.length; i++) {
+		drawLink(listOfAxes[i][0], listOfAxes[i][1], listOfAxes[i][2], listOfAxes[i][3], 
+		         listOfAxes[i][4], listOfAxes[i][5], listOfAxes[i][6], listOfAxes[i][7]);
+	}
+}
+
 /*
  * This function draws a joint.  A joint is represented as a cube.  The color is represented as a 
  * vec4 RGB vector.
@@ -682,7 +705,7 @@ function extrudeJoint1() {
 	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);//0.5 * JOINT1_HEIGHT, 0.0), s); //, 0.0), s);
 	var t = mult(modelViewMatrix, instanceMatrix);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 0, 36);
+	gl.drawArrays(gl.TRIANGLES, 108, 36);
 } // End function extrudeJoint1()
 
 function extrudeLink1() {
@@ -690,7 +713,7 @@ function extrudeLink1() {
 	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
 	var t = mult(modelViewMatrix, instanceMatrix);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 0, 36);
+	gl.drawArrays(gl.TRIANGLES, 108, 36);
 } // End function extrudeLink1()
 
 // Extrude joint 2:
@@ -699,7 +722,7 @@ function extrudeJoint2() {
 	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
 	var t = mult(modelViewMatrix,instanceMatrix);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 0, 36);
+	gl.drawArrays(gl.TRIANGLES, 108, 36);
 } // End function extrudeJoint2()
 
 function extrudeLink2() {
@@ -707,9 +730,23 @@ function extrudeLink2() {
 	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
 	var t = mult(modelViewMatrix, instanceMatrix);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 0, 36);
+	gl.drawArrays(gl.TRIANGLES, 108, 36);
 } // End function extrudeLink2()
 
+// This function renders a single joint
+function extrudeJoint(jointLength, jointWidth, jointHeight) {
+	var s = scale4(LINK1_LENGTH, LINK1_WIDTH, LINK1_HEIGHT);
+	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
+	var t = mult(modelViewMatrix, instanceMatrix);
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+	gl.drawArrays(gl.TRIANGLES, 108, 36);
+} // End function extrudeJoint()
+
+// This function renders the coordinate axes:
+function renderAxes() {
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+	gl.drawArrays(gl.TRIANGLES, 0, 108);
+} // End function renderAxes();
 
 // Rendering function:
 function render() {
@@ -717,6 +754,10 @@ function render() {
 
 	// We want the camera to look from the point (1, 1, 1):
 	modelViewMatrix = lookAt([0.1, 0.1, 0.1], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
+	
+	// Render the origin coordinate axes:
+	renderAxes();
+	
 	modelViewMatrix = mult(modelViewMatrix, rotate(theta[0], 0, 1, 0));
 	extrudeJoint1();
 	
@@ -731,16 +772,20 @@ function render() {
 	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, 0.0, 0.0));
 	extrudeLink2();
 	
+	// Render all joints and links:
+	for(var i = 0; i < joints.length; i++) {
+	
+		// Render the next joint:
+		modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], axes[i][0], axes[i][1], axes[i][2]));
+		
+	
+	} // End for
 	
 	
-	//modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0, 0.0));
-	//modelViewMatrix = mult(modelViewMatrix, rotate(0, 0, 0, 1));
-	//extrudeLink1();
 	
-	//gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
     //gl.drawArrays( gl.TRIANGLES, 72, 36); //NumVertices );
 	
-	//gl.drawArrays(gl.TRIANGLES, 0, 36);
+	
 	
 	requestAnimFrame(render);
 

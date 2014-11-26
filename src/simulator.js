@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/22/14 - 3:58 PM
+ * Last Updated: 11/26/14 - 12:41 PM
  */ 
 
 var canvas;
@@ -66,12 +66,14 @@ var rotationAxes = [];
 var jointAngles = [];
 
 // Perspective Matrix Constants:
+/*
 var left = -1.0;
 var right = 1.0;
 var ytop = 1.0
 var near = -1;
 var far = 1;
 var bottom = -1.0;
+*/
 
 var thetaLoc;
 
@@ -249,8 +251,8 @@ window.onload = function init() {
     
  	//drawJoint(0.5, 0.0, 0.0);
 	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
-	joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
-	joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
+	//joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
+	//joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
 	
 	// Origin Coordinate Frame:
 	/*
@@ -259,10 +261,15 @@ window.onload = function init() {
 	links.push([0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006, 3]);
 	*/
 	
-	links.push([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0]);
+	//links.push([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0]);
 	
-	drawAllJoints(joints);
-	drawAllLinks(links);
+	//drawAllJoints(joints);
+	//drawAllLinks(links);
+	
+	// Draw the reference cube:
+	referenceCube();
+	//colorCube();
+	
 	// drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0);
 	
     gl.viewport( 0, 0, canvas.width, canvas.height );
@@ -292,25 +299,25 @@ window.onload = function init() {
     gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
-	// Set the shader variable locations:
-    thetaLoc = gl.getUniformLocation(program, "theta"); 
+	// Set the shader variable locations: 
 	modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	
-	projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+	//projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+	projectionMatrix = ortho(-10, 10, -10, 10, -10, 10);
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     	
 	document.getElementById("cubeAngleX").onchange = function() {
 		//theta = document.getElementById("cubeAngle").value;
 		//axis = xAxis;
-		theta[axis] = event.srcElement.value; //document.getElementById("cubeAngleX").value;
+		theta[0] = event.srcElement.value; //document.getElementById("cubeAngleX").value;
 		render();
 	};
 
 	document.getElementById("cubeAngleY").onchange = function() {
         //theta = document.getElementById("cubeAngle").value;
         //axis = yAxis;
-        theta[axis] = event.srcElement.value; document.getElementById("cubeAngleY").value;
+        theta[1] = event.srcElement.value; document.getElementById("cubeAngleY").value;
         render();
     };
 
@@ -327,13 +334,13 @@ window.onload = function init() {
 	rotationAxes.push([0, 1, 0]);
 	
 	document.getElementById("rotJoint1").onchange = function() {
-		axis = xAxis;
+		axis = 0;
 		theta[axis] = event.srcElement.value;
 		render();
 	};
 	
 	document.getElementById("rotJoint2").onchange = function() {
-		axis = xAxis;
+		axis = 1;
 		theta[axis] = event.srcElement.value;
 		render();
 	}; 
@@ -535,14 +542,6 @@ function drawJoint(jointX, jointY, jointZ, color) {
 	NumVertices += 36;	
 	//NumVertices = 36;
 
-	/*
-	jointside(1, 0, 3, 2);
-	jointside(2, 3, 7, 6);
-	jointside(3, 0, 4, 7);
-	jointside(6, 5, 1, 2);
-	jointside(4, 5, 6, 7);
-	jointside(5, 4, 0, 1);
-	*/
 } // End function drawJoint()
 
 // This function draws a link.  A link is represented by a rectangular prism:
@@ -601,6 +600,16 @@ function drawLink(startX, startY, startZ,
 	
 } // End function drawLink()
 
+// This function creates a black cube to be shaped for the joints and links:
+function referenceCube() {
+	quad(1, 0, 3, 2);
+	quad(2, 3, 7, 6);
+	quad(3, 0, 4, 7);
+	quad(6, 5, 1, 2);
+	quad(4, 5, 6, 7);
+	quad(5, 4, 0, 1);
+} // End function referenceCube()
+
 function colorCube()
 {
     quad( 1, 0, 3, 2 );
@@ -615,14 +624,14 @@ function colorCube()
 function quad(a, b, c, d) 
 {
     var vertices = [
-        vec3( -0.1, -0.1,  0.1 ),
-        vec3( -0.1,  0.1,  0.1 ),
-        vec3(  0.1,  0.1,  0.1 ),
-        vec3(  0.1, -0.1,  0.1 ),
-        vec3( -0.1, -0.1, -0.1 ),
-        vec3( -0.1,  0.1, -0.1 ),
-        vec3(  0.1,  0.1, -0.1 ),
-        vec3(  0.1, -0.1, -0.1 )
+        vec3( -0.5, -0.5,  0.5 ),
+        vec3( -0.5,  0.5,  0.5 ),
+        vec3(  0.5,  0.5,  0.5 ),
+        vec3(  0.5, -0.5,  0.5 ),
+        vec3( -0.5, -0.5, -0.5 ),
+        vec3( -0.5,  0.5, -0.5 ),
+        vec3(  0.5,  0.5, -0.5 ),
+        vec3(  0.5, -0.5, -0.5 )
     ];
 
     var vertexColors = [
@@ -646,50 +655,92 @@ function quad(a, b, c, d)
 
     for ( var i = 0; i < indices.length; ++i ) {
         points.push( vertices[indices[i]] );
-        colors.push( vertexColors[indices[i]] );
+        //colors.push( vertexColors[indices[i]] );
+		colors.push(vertexColors[0]);
     } // End for
 }
 
-// Tests for joint 1 and joint 2 with 1 link betweek:
-function drawJoint1() {
-	var s = mat4(1, 0, 0, 0, 
-	             0, 1, 0, 0,
-				 0, 0, 1, 0,
-				 0, 0, 0, 1);
+function scale4(a, b, c) {
+	var result = mat4();
+	result[0][0] = a;
+	result[1][1] = b;
+	result[2][2] = c;
+	return result;
+}
+
+var JOINT1_LENGTH = 0.75;
+var JOINT1_WIDTH = 0.75;
+var JOINT1_HEIGHT = 0.75;
+
+var LINK1_LENGTH = 2;
+var LINK1_WIDTH = 0.25;
+var LINK1_HEIGHT = 0.25;
+
+// Extrude a joint:
+function extrudeJoint1() {
+	var s = scale4(JOINT1_LENGTH, JOINT1_WIDTH, JOINT1_HEIGHT);
+	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);//0.5 * JOINT1_HEIGHT, 0.0), s); //, 0.0), s);
+	var t = mult(modelViewMatrix, instanceMatrix);
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+	gl.drawArrays(gl.TRIANGLES, 0, 36);
+} // End function extrudeJoint1()
+
+function extrudeLink1() {
+	var s = scale4(LINK1_LENGTH, LINK1_WIDTH, LINK1_HEIGHT);
 	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
 	var t = mult(modelViewMatrix, instanceMatrix);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 0, 36); //NumVertices);
-} // End function drawJoint1()
+	gl.drawArrays(gl.TRIANGLES, 0, 36);
+} // End function extrudeLink1()
 
-function drawLink1() {
+// Extrude joint 2:
+function extrudeJoint2() {
+	var s = scale4(JOINT1_LENGTH, JOINT1_WIDTH, JOINT1_HEIGHT);
+	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
+	var t = mult(modelViewMatrix,instanceMatrix);
+	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
+	gl.drawArrays(gl.TRIANGLES, 0, 36);
+} // End function extrudeJoint2()
 
-} // End function drawLink1()
-
-function drawJoint2() {
-	var s = mat4(1, 0, 0, 0, 
-	             0, 1, 0, 0,
-				 0, 0, 1, 0,
-				 0, 0, 0, 1);
-	var instanceMatrix = mult(translate(1.0, 0.0, 0.0), s);
+function extrudeLink2() {
+	var s = scale4(LINK1_LENGTH, LINK1_WIDTH, LINK1_HEIGHT);
+	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
 	var t = mult(modelViewMatrix, instanceMatrix);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 37, 72);
-} // End function drawJoint2()
-
+	gl.drawArrays(gl.TRIANGLES, 0, 36);
+} // End function extrudeLink2()
 
 
 // Rendering function:
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    //gl.uniform3fv(thetaLoc, theta);
-
 	// We want the camera to look from the point (1, 1, 1):
 	modelViewMatrix = lookAt([0.1, 0.1, 0.1], [0.0, 0.0, 0.0], [0.0, 0.0, 1.0]);
+	modelViewMatrix = mult(modelViewMatrix, rotate(theta[0], 0, 1, 0));
+	extrudeJoint1();
 	
-	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
-    gl.drawArrays( gl.TRIANGLES, 72, 36); //NumVertices );
+	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, 0.0, 0.0));
+	//modelViewMatrix = mult(modelViewMatrix, rotate(0, 0, 0, 1));
+	extrudeLink1();
+	
+	modelViewMatrix = mult(modelViewMatrix, translate(LINK1_LENGTH - JOINT1_LENGTH, 0.0, 0.0));
+	modelViewMatrix = mult(modelViewMatrix, rotate(theta[1], 0, 1, 0));
+	extrudeJoint2();
+	
+	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, 0.0, 0.0));
+	extrudeLink2();
+	
+	
+	
+	//modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0, 0.0));
+	//modelViewMatrix = mult(modelViewMatrix, rotate(0, 0, 0, 1));
+	//extrudeLink1();
+	
+	//gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
+    //gl.drawArrays( gl.TRIANGLES, 72, 36); //NumVertices );
+	
+	//gl.drawArrays(gl.TRIANGLES, 0, 36);
 	
 	requestAnimFrame(render);
 

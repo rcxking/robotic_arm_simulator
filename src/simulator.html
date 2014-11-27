@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 11/26/14 - 2:15 PM
+Last Updated: 11/26/14 - 9:58 PM
 -->
 
 
@@ -34,7 +34,6 @@ Last Updated: 11/26/14 - 2:15 PM
 		void main() {
 							
 			fColor = vColor;
-			//gl_Position = projectionMatrix * modelViewMatrix *  rz * ry * rx * vPosition; // rz * ry * rx * vPosition;
 			gl_Position = projectionMatrix * modelViewMatrix * vPosition;
 		} // End vertex shader function main()
 	</script>
@@ -70,8 +69,6 @@ Last Updated: 11/26/14 - 2:15 PM
 		<input id="cubeAngleY" type="range" min="-360" max="360" value="0" step="1">Adjust Cube Angle (Y-Axis)</input>
 		<input id="cubeAngleZ" type="range" min="-360" max="360" value="0" step="1">Adjust Cube Angle (Z-Axis)</input>
 		
-		<input id="rotJoint1" type="range" min="0" max="360" value="0" step="1">Rotate Joint 1</input>
-		<input id="rotJoint2" type="range" min="0" max="360" value="0" step="1">Rotate Joint 2</input>
 		<!-- END SECTION TO REMOVE -->
 
 		<!-- Joints Section--> 

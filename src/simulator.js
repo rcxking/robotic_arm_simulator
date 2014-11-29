@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/27/14 - 6:48 PM
+ * Last Updated: 11/28/14 - 5:37 PM
  */ 
 
 var canvas;
@@ -165,6 +165,18 @@ function addJointCallback() {
 		console.log("deltaY: " + deltaY);
 		console.log("deltaZ: " + deltaZ);
 		
+		if(deltaX == 0.0) {
+			deltaX += 0.25;
+		} 
+		
+		if(deltaY == 0.0) {
+			deltaY += 0.25;
+		} 
+		
+		if(deltaZ == 0.0) {
+			deltaZ += 0.25;
+		}
+		
 		links.push([deltaX, deltaY, deltaZ]);
 		
 		// Calculate the length of the next joint:
@@ -264,33 +276,14 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-	// Test to draw coordinate axes:
-	//drawLink(0.0, 0.0, 0.0, 1.5, 0.0, 0.0, 0.006, 1);
-	//drawLink(0.0, 0.0, 0.0, 0.0, 1.5, 0.0, 0.006, 2);
-	//drawLink(0.0, 0.0, 0.0, 0.0, 0.0, 1.5, 0.006, 3);
-    
- 	//drawJoint(0.5, 0.0, 0.0);
-	//drawJoint(0.0, 0.0, 0.0, 2); // The first joint will be blue
-	//joints.push([0.0, 0.0, 0.0, [0.0, 0.0, 1.0, 1.0]]);
-	//joints.push([1.0, 0.0, 0.0, [0.0, 1.0, 0.0, 1.0]]);
-	
 	// Origin Coordinate Frame:
 	axes.push([0.0, 0.0, 0.0, 8.5, 0.0, 0.0, 0.05, 1]);
 	axes.push([0.0, 0.0, 0.0, 0.0, 8.5, 0.0, 0.05, 2]);
 	axes.push([0.0, 0.0, 0.0, 0.0, 0.0, 8.5, 0.05, 3]);
 	drawAllAxes(axes);
 	
-	
-	//links.push([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0]);
-	
-	//drawAllJoints(joints);
-	//drawAllLinks(links);
-	
 	// Draw the reference cube:
 	referenceCube();
-	
-	
-	// drawLink(0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.01, 0);
 	
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -323,22 +316,13 @@ window.onload = function init() {
 	modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	
-	//projectionMatrix = ortho(left, right, bottom, ytop, near, far);
 	projectionMatrix = ortho(-10, 10, -10, 10, -10, 10);
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     	
 	document.getElementById("newJoint").onclick = function() {
-		//NumVertices = 0;
+		
 		addJointCallback();
-		//drawAllJoints(joints);
-		//drawAllLinks(links);
-		
-		//gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-		//gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
-		
-		//gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-		//gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
-		
+	
 		console.log("after the newJointButton was clicked, before rendering, NumVertices is: " + NumVertices);
 		console.log("Before rendering, joints.length is: " + joints.length);
 		render();
@@ -579,18 +563,6 @@ function referenceCube() {
 	quad(5, 4, 0, 1);
 } // End function referenceCube()
 
-/*
-function colorCube()
-{
-    quad( 1, 0, 3, 2 );
-    quad( 2, 3, 7, 6 );
-    quad( 3, 0, 4, 7 );
-    quad( 6, 5, 1, 2 );
-    quad( 4, 5, 6, 7 );
-    quad( 5, 4, 0, 1 );
-}
-*/
-
 function quad(a, b, c, d) 
 {
     var vertices = [
@@ -641,6 +613,7 @@ var JOINT_LENGTH = 0.75;
 var JOINT_WIDTH = 0.75;
 var JOINT_HEIGHT = 0.75;
 
+/*
 var LINK_LENGTH = 2;
 var LINK_WIDTH = 0.25;
 var LINK_HEIGHT = 0.25;
@@ -649,10 +622,12 @@ var JOINT1_LENGTH = 0.75;
 var JOINT1_WIDTH = 0.75;
 var JOINT1_HEIGHT = 0.75;
 
-var LINK1_LENGTH = 0.25;
-var LINK1_WIDTH = 2;
+var LINK1_LENGTH = 2;
+var LINK1_WIDTH = 0.25;
 var LINK1_HEIGHT = 0.25;
+*/
 
+/*
 // Extrude a joint:
 function extrudeJoint1() {
 	var s = scale4(JOINT1_LENGTH, JOINT1_WIDTH, JOINT1_HEIGHT);
@@ -686,6 +661,7 @@ function extrudeLink2() {
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
 	gl.drawArrays(gl.TRIANGLES, 108, 36);
 } // End function extrudeLink2()
+*/
 
 // This function renders a single link:
 function extrudeLink(linkToRender) {
@@ -695,19 +671,26 @@ function extrudeLink(linkToRender) {
 	console.log("links[" + linkToRender + "][2] is: " + links[linkToRender][2]);
 
 	var s = scale4(Number(links[linkToRender][0]), Number(links[linkToRender][1]), Number(links[linkToRender][2]));
-	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
+	var instanceMatrix;
+	
+	if(links[linkToRender][0] != 0.25) {
+		instanceMatrix = mult(translate(links[linkToRender][0] / 2, 0.0, 0.0), s);
+	} else if(links[linkToRender][1] != 0.25) {
+		instanceMatrix = mult(translate(0.0, links[linkToRender][1] / 2, 0.0), s);
+	} else if(links[linkToRender][2] != 0.25) {
+		instanceMatrix = mult(translate(0.0, 0.0, links[linkToRender][2] / 2), s);
+	} // End if-else-if
+	
 	var t = mult(modelViewMatrix, instanceMatrix);
 	console.log("t is: " + t);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
 	
-	/*
 	for(var i = 108; i < 108 + 36; i++) {
 		colors[i] = vec4(0.0, 0.0, 0.0, 1.0);
 	} // End for
 	
 	gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
 	gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
-	*/
 	
 	gl.drawArrays(gl.TRIANGLES, 108, 36);
 } // End function extrudeLink()
@@ -746,11 +729,12 @@ function render() {
 	renderAxes();
 	
 	
+	/*
 	modelViewMatrix = mult(modelViewMatrix, rotate(theta[0], 0, 1, 0));
 	extrudeJoint1();
 	
-	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, 0.0, 0.0));
-	//modelViewMatrix = mult(modelViewMatrix, rotate(0, 0, 0, 1));
+	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, JOINT1_WIDTH, 0.0));
+	modelViewMatrix = mult(modelViewMatrix, rotate(45, 0, 0, 1));
 	extrudeLink1();
 	
 	modelViewMatrix = mult(modelViewMatrix, translate(LINK1_LENGTH - JOINT1_LENGTH, 0.0, 0.0));
@@ -759,9 +743,9 @@ function render() {
 	
 	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, 0.0, 0.0));
 	extrudeLink2();
+	*/
 	
 	
-	/*
 	// Render all joints and links:
 	for(var i = 0; i < joints.length; i++) {
 	
@@ -776,15 +760,50 @@ function render() {
 			console.log("This is the " + (i - 1) + " link to be rendered");
 				
 			console.log("Now extruding links[" + (i-1) + "]");
-			modelViewMatrix = mult(modelViewMatrix, translate(JOINT_LENGTH, 0.0, 0.0));
-			extrudeLink(i-1);
+			
+			/*
+			 * The robot arm links will be in only either the X, Y, or Z directions.
+			 * This logic determines whether to shift the link in the X, Y, or Z directions.
+			 */
+			
+			if(links[i - 1][0] != 0.25) {
+				// Translate in the X-Direction:
+				console.log("Translating in the X-Direction!");
+				modelViewMatrix = mult(modelViewMatrix, translate(JOINT_LENGTH / 2.0, 0.0, 0.0));
+				extrudeLink(i-1);
+				
+				// Render the next joint:
+				modelViewMatrix = mult(modelViewMatrix, translate(links[i-1][0], 0.0, 0.0));
+				modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[i][0], rotationAxes[i][1], rotationAxes[i][2]));
+				extrudeJoint(joints[i][3]);
+			} else if(links[i - 1][1] != 0.25) {
+				// Translate in the Y-Direction:
+				console.log("Translating in the Y-Direction!");
+				modelViewMatrix = mult(modelViewMatrix, translate(0.0, JOINT_WIDTH / 2.0, 0.0));
+				extrudeLink(i-1);
+				
+				// Render the next joint:
+				modelViewMatrix = mult(modelViewMatrix, translate(0.0, links[i-1][1], 0.0));
+				modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[i][0], rotationAxes[i][1], rotationAxes[i][2]));
+				extrudeJoint(joints[i][3]);
+			} else {
+				// Translate in the Z-Direction:
+				console.log("Translating in the Z-Direction!");
+				modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0.0, JOINT_HEIGHT / 2.0));
+				extrudeLink(i-1);
+				
+				// Render the next joint:
+				modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0.0, links[i-1][2]));
+				modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[i][0], rotationAxes[i][1], rotationAxes[i][2]));
+				extrudeJoint(joints[i][3]);
+			}
+			
 			
 			//modelViewMatrix = mult(modelViewMatrix, translate(links[i-1][0] - joints[i][0], links[i-1][1] - joints[i][1], links[i-1][2] - joints[i][2]));
 			//modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[i][0], rotationAxes[i][1], rotationAxes[i][2]));
 			//extrudeJoint(joints[i][3]);
 		} // End else-if
 	} // End for
-	*/
 	
 	console.log("Done rendering!");
 	

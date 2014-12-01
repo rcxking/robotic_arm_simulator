@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/28/14 - 5:37 PM
+ * Last Updated: 11/30/14 - 10:33 PM
  */ 
 
 var canvas;
@@ -73,7 +73,7 @@ var hasLoaded = 0;
  * For N joints, there are N - 1 joints.  This variable keeps track of whether we have
  * more than 1 joint, as if we just have a single joint, no link should be drawn.
  */
-var beginDrawingLinks = false;
+//var beginDrawingLinks = false;
 
 /*
  * This function allows new joint elements to be added to the simulator webpage.
@@ -178,11 +178,15 @@ function addJointCallback() {
 		}
 		
 		links.push([deltaX, deltaY, deltaZ]);
-		
-		// Calculate the length of the next joint:
-		//links.push([newJointXPos, newJointYPos, newJointZPos]);
-		
 	} // End if
+	
+	/*
+	 * Finally, we need to append a row in the kinematics data table for this joint.
+	 * This row will be populated in the render() functions.
+	 */
+	var dataTable = document.getElementById("kinematicsData");
+	var tableRow = document.createElement('TR');
+	dataTable.appendChild(tableRow);
 	
 } // End function addHTMLElement()
 
@@ -437,66 +441,6 @@ function drawAllAxes(listOfAxes) {
 	} // End for
 } // End function drawAllAxes()
 
-
-/*
- * This function draws a joint.  A joint is represented as a cube.  The color is represented as a 
- * vec4 RGB vector.
- */
- /*
-function drawJoint(jointX, jointY, jointZ, color) {
-
-	console.log("Now calling drawJoint() at:");
-	console.log("jointX: " + jointX);
-	console.log("jointY: " + jointY);
-	console.log("jointZ: " + jointZ);
-	
-	var scaledJointX = jointX / 4.0;
-	var scaledJointY = jointY / 4.0;
-	var scaledJointZ = jointZ / 4.0;
-	
-	// The vertices of the joint:
-	var vertices = [
-		vec3(scaledJointX - 0.04, scaledJointY - 0.04, scaledJointZ + 0.04),
-		vec3(scaledJointX - 0.04, scaledJointY + 0.04, scaledJointZ + 0.04),
-        vec3(scaledJointX + 0.04, scaledJointY + 0.04, scaledJointZ + 0.04),
-        vec3(scaledJointX + 0.04, scaledJointY - 0.04, scaledJointZ + 0.04),
-        vec3(scaledJointX - 0.04, scaledJointY - 0.04, scaledJointZ - 0.04),
-        vec3(scaledJointX - 0.04, scaledJointY + 0.04, scaledJointZ - 0.04),
-        vec3(scaledJointX + 0.04, scaledJointY + 0.04, scaledJointZ - 0.04),
-        vec3(scaledJointX + 0.04, scaledJointY - 0.04, scaledJointZ - 0.04)
-	];
-
-	console.log("vertices is: " + vertices);
-
-	// a-b-c-a-c-d
-	var verticesOfJoints = [1, 0, 3, 1, 3, 2,
-	                        2, 3, 7, 2, 7, 6,
-							3, 0, 4, 3, 4, 7, 
-							6, 5, 1, 6, 1, 2,
-							4, 5, 6, 4, 6, 7,  
-							5, 4, 0, 5, 0, 1 ];
-
-	// The joint will be a solid cube of red:
-	var jointColors = [
-					vec4(1.0, 0.0, 0.0, 1.0), // Red
-					vec4(0.0, 1.0, 0.0, 1.0), // Green
-					vec4(0.0, 0.0, 1.0, 1.0) // Blue
-					];
-
-	// Add all vertices to be rendered:
-	for(var i = 0; i < verticesOfJoints.length; i++) {
-		points.push(vertices[verticesOfJoints[i]]);
-		//colors.push(jointColors[color]);
-		colors.push(color);
-	} // End for 
-														
-	// For each joint, there are 36 vertices to render:
-	NumVertices += 36;	
-	//NumVertices = 36;
-
-} // End function drawJoint()
-*/
-
 // This function draws a link.  A link is represented by a rectangular prism:
 // Use 0.01 for a joint link.
 function drawLink(startX, startY, startZ,
@@ -614,20 +558,6 @@ var JOINT_WIDTH = 0.75;
 var JOINT_HEIGHT = 0.75;
 
 /*
-var LINK_LENGTH = 2;
-var LINK_WIDTH = 0.25;
-var LINK_HEIGHT = 0.25;
-
-var JOINT1_LENGTH = 0.75;
-var JOINT1_WIDTH = 0.75;
-var JOINT1_HEIGHT = 0.75;
-
-var LINK1_LENGTH = 2;
-var LINK1_WIDTH = 0.25;
-var LINK1_HEIGHT = 0.25;
-*/
-
-/*
 // Extrude a joint:
 function extrudeJoint1() {
 	var s = scale4(JOINT1_LENGTH, JOINT1_WIDTH, JOINT1_HEIGHT);
@@ -728,24 +658,6 @@ function render() {
 	// Render the origin coordinate axes:
 	renderAxes();
 	
-	
-	/*
-	modelViewMatrix = mult(modelViewMatrix, rotate(theta[0], 0, 1, 0));
-	extrudeJoint1();
-	
-	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, JOINT1_WIDTH, 0.0));
-	modelViewMatrix = mult(modelViewMatrix, rotate(45, 0, 0, 1));
-	extrudeLink1();
-	
-	modelViewMatrix = mult(modelViewMatrix, translate(LINK1_LENGTH - JOINT1_LENGTH, 0.0, 0.0));
-	modelViewMatrix = mult(modelViewMatrix, rotate(theta[1], 0, 1, 0));
-	extrudeJoint2();
-	
-	modelViewMatrix = mult(modelViewMatrix, translate(JOINT1_LENGTH, 0.0, 0.0));
-	extrudeLink2();
-	*/
-	
-	
 	// Render all joints and links:
 	for(var i = 0; i < joints.length; i++) {
 	
@@ -805,14 +717,27 @@ function render() {
 		} // End else-if
 	} // End for
 	
+	// Let's now populate the kinematics table:
+	console.log("Now populating kinematics table.");
+	for(var i = 0; i < joints.length; i++) {
+		
+		// This is a reference to the kinematicsData table element:
+		var dataTable = document.getElementById("kinematicsData");
+		
+		console.log("dataTable: " + dataTable);
+		
+		// Populate this row for joint i:
+		for(var j = 0; j < 5; j++) {
+				var td = document.createElement('TD');
+				td.width = '75';
+				td.appendChild(document.createTextNode("0"));
+				dataTable.rows[i].appendChild(td);
+		} // End for
+	} // End for
+	console.log("Done populating kinematics table!");
+	
 	console.log("Done rendering!");
 	
-    //gl.drawArrays( gl.TRIANGLES, 72, 36); //NumVertices );
-	
-	
-	
-	//requestAnimFrame(render);
-
 } // End function render()
 
 /*** END SECTION DRAWING FUNCTIONS ***/

@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/30/14 - 10:33 PM
+ * Last Updated: 11/30/14 - 11:46 PM
  */ 
 
 var canvas;
@@ -68,12 +68,6 @@ var projectionMatrix;
 var projectionMatrixLoc;
 
 var hasLoaded = 0;
-
-/*
- * For N joints, there are N - 1 joints.  This variable keeps track of whether we have
- * more than 1 joint, as if we just have a single joint, no link should be drawn.
- */
-//var beginDrawingLinks = false;
 
 /*
  * This function allows new joint elements to be added to the simulator webpage.
@@ -346,7 +340,7 @@ window.onload = function init() {
  *         mat (the matrix to scale)
  * Returns: scaled matrix
  *
- * Verified/Tested 10/21
+ * Verified/Tested 12/1/14
  */   
 function scaleMatrix(scale, mat) {
 
@@ -354,12 +348,41 @@ function scaleMatrix(scale, mat) {
 	
 	for(var i = 0; i < mat.length; i++) {
 		for(var j = 0; j < mat[0].length; j++) {
-			scaledMat[i][j] = mat[i][j] * 3;
+			scaledMat[i][j] = mat[i][j] * scale;
 		} // End for
 	} // End for
 
 	return scaledMat;
 } // End function scaleMatrix()
+
+/*
+ * multMatVec() multiples a matrix by a vector.  Assume that the matrix
+ * and the vector have the same dimension.
+ *
+ * Inputs: matrix 
+ *         vector
+ * Returns: A vector of the outer-most dimensions.
+ *
+ * Tested/Verified: 12/1/14
+ */
+function multMatVec(matrix, vector) {
+	
+	// The final multiplication:
+	var result = [];
+	
+	for(var i = 0; i < matrix.length; i++) {
+	
+		var rowSum = 0;
+		
+		for(var j = 0; j < matrix[i].length; j++) {
+			rowSum += matrix[i][j] * vector[j];
+		} // End for
+		
+		result.push(rowSum);
+	} // End for
+	
+	return result;
+} // End function multMatVec()
 
 /*** END SECTION ADDITIONAL MATRIX/VECTOR FUNCTIONS ***/
 
@@ -401,9 +424,12 @@ function rot3D(k, theta) {
 	var kx = mat3(     0, -1*k[2],   k[1],
 	                 k[2],     0, -1*k[0],
 				  -1*k[1],   k[0],     0);
+	console.log("kx is: " + kx);
+	
 	var I3 = mat3(1, 0, 0,
 	              0, 1, 0,
                   0, 0, 1);
+	console.log("I3 is: " + I3);
 
 	var subMatrix = add(add(I3, scaleMatrix(Math.sin(theta), kx)),
 	                    mult(scaleMatrix((1-Math.cos(theta)), kx), kx));
@@ -423,15 +449,6 @@ function drawAllLinks(listOfLinks) {
 		         listOfLinks[i][4], listOfLinks[i][5], listOfLinks[i][6], listOfLinks[i][7]);
 	} // End for
 } // End function drawAllLinks()
-
-/*
-// This function takes a list of joint parameters and draws all of them:
-function drawAllJoints(listOfJoints) {
-	for(var i = 0; i < listOfJoints.length; i++) {
-		drawJoint(listOfJoints[i][0], listOfJoints[i][1], listOfJoints[i][2], listOfJoints[i][3]);
-	} // End for
-} // End function drawAllJoints()
-*/
 
 // This function takes a list of the coordinate axes to draw and draws all of them:
 function drawAllAxes(listOfAxes) {
@@ -493,7 +510,6 @@ function drawLink(startX, startY, startZ,
 
 	// There are 36 vertices to render:
 	NumVertices += 36;
-	//NumVertices = 36;
 	
 } // End function drawLink()
 
@@ -556,42 +572,6 @@ function scale4(a, b, c) {
 var JOINT_LENGTH = 0.75;
 var JOINT_WIDTH = 0.75;
 var JOINT_HEIGHT = 0.75;
-
-/*
-// Extrude a joint:
-function extrudeJoint1() {
-	var s = scale4(JOINT1_LENGTH, JOINT1_WIDTH, JOINT1_HEIGHT);
-	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
-	var t = mult(modelViewMatrix, instanceMatrix);
-	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 108, 36);
-} // End function extrudeJoint1()
-
-function extrudeLink1() {
-	var s = scale4(LINK1_LENGTH, LINK1_WIDTH, LINK1_HEIGHT);
-	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
-	var t = mult(modelViewMatrix, instanceMatrix);
-	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 108, 36);
-} // End function extrudeLink1()
-
-// Extrude joint 2:
-function extrudeJoint2() {
-	var s = scale4(JOINT1_LENGTH, JOINT1_WIDTH, JOINT1_HEIGHT);
-	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
-	var t = mult(modelViewMatrix,instanceMatrix);
-	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 108, 36);
-} // End function extrudeJoint2()
-
-function extrudeLink2() {
-	var s = scale4(LINK1_LENGTH, LINK1_WIDTH, LINK1_HEIGHT);
-	var instanceMatrix = mult(translate(0.0, 0.0, 0.0), s);
-	var t = mult(modelViewMatrix, instanceMatrix);
-	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
-	gl.drawArrays(gl.TRIANGLES, 108, 36);
-} // End function extrudeLink2()
-*/
 
 // This function renders a single link:
 function extrudeLink(linkToRender) {
@@ -710,10 +690,6 @@ function render() {
 				extrudeJoint(joints[i][3]);
 			}
 			
-			
-			//modelViewMatrix = mult(modelViewMatrix, translate(links[i-1][0] - joints[i][0], links[i-1][1] - joints[i][1], links[i-1][2] - joints[i][2]));
-			//modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[i][0], rotationAxes[i][1], rotationAxes[i][2]));
-			//extrudeJoint(joints[i][3]);
 		} // End else-if
 	} // End for
 	
@@ -726,13 +702,75 @@ function render() {
 		
 		console.log("dataTable: " + dataTable);
 		
-		// Populate this row for joint i:
-		for(var j = 0; j < 5; j++) {
-				var td = document.createElement('TD');
-				td.width = '75';
-				td.appendChild(document.createTextNode("0"));
-				dataTable.rows[i].appendChild(td);
+		// Calculate the forward kinematics for this joint:
+		
+		/*
+		 * Rotational forward kinematics:
+		 * 
+		 * The rotational forward kinematics is calculated by the sum of the previous
+		 * joints of the arm (not including the current joint).
+		 */
+		var rotFwdKine = 0;
+		
+		for(var j = 0; j < i; j++) {
+			rotFwdKine += jointAngles[j];
 		} // End for
+		
+		console.log("Rotational Forward Kinematics: " + rotFwdKine);
+		
+		/*
+		 * Translational forward kinematics:
+		 *
+		 * The translational forward kinematics is calculated by the following formula:
+		 *
+		 * P0T = P01 + R01 * P12 + R01 * R12 * P23 + ... + R0N * PNT
+		 *
+		 * In the simulator, the reference frame is attached to the first joint.  This means
+		 * that P01 is 0 for all robot arms.
+		 */
+		var transFwdKine = [0, 0, 0];
+		
+		// Iterate through all the links:
+		for(var j = 0; j < i; j++) {
+		
+			/*
+			 * We need to reduce the X, Y, Z, values that are 0.25 to 0.
+			 * These link values are 0.25 because that's the width of links to draw.
+			 */
+			var newLink = links[j].slice(0); // Make a copy by value, not by reference.
+			if(newLink[0] == 0.25) {
+				newLink[0] = 0.0;
+			} // End if
+			
+			if(newLink[1] == 0.25) {
+				newLink[1] = 0.0;
+			} // End if
+			
+			if(newLink[2] == 0.25) {
+				newLink[2] = 0.0;
+			} // End if
+			
+			console.log("links[j] is: " + links[j]);
+			console.log("newLink is: " + newLink);
+		
+			var rotationMatrix = mat3();
+			// Iterate through all the joints:
+			for(var k = 0; k < i; k++) {
+				rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], jointAngles[k]));
+			} // End for
+			
+			var nextStep = multMatVec(rotationMatrix, newLink);
+			
+			transFwdKine = add(transFwdKine, nextStep);
+			
+		} // End for
+		console.log("Translational Forward Kinematics: " + transFwdKine);
+		
+		// Populate this row for joint i:
+		var td = document.createElement('TD');
+		td.width = '75';
+		td.appendChild(document.createTextNode("0"));
+		dataTable.rows[i].appendChild(td);
 	} // End for
 	console.log("Done populating kinematics table!");
 	

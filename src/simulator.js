@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 11/30/14 - 11:46 PM
+ * Last Updated: 12/1/14 - 4:08 PM
  */ 
 
 var canvas;
@@ -713,7 +713,7 @@ function render() {
 		var rotFwdKine = 0;
 		
 		for(var j = 0; j < i; j++) {
-			rotFwdKine += jointAngles[j];
+			rotFwdKine += Number(jointAngles[j]);
 		} // End for
 		
 		console.log("Rotational Forward Kinematics: " + rotFwdKine);
@@ -750,15 +750,19 @@ function render() {
 				newLink[2] = 0.0;
 			} // End if
 			
-			console.log("links[j] is: " + links[j]);
-			console.log("newLink is: " + newLink);
+			//console.log("links[j] is: " + links[j]);
+			//console.log("newLink is: " + newLink);
 		
 			var rotationMatrix = mat3();
+			console.log("For joint " + (i + 1) + " the initial rotation Matrix is: " + rotationMatrix);
+
 			// Iterate through all the joints:
 			for(var k = 0; k < i; k++) {
-				rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], jointAngles[k]));
+				console.log("joint[k] is: " + Number(jointAngles[k]) * Math.PI / 180.0);
+				rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], Number(jointAngles[k]) * Math.PI / 180.0));
 			} // End for
 			
+			console.log("For joint " + (i + 1) + " the rotationMatrix is: " + rotationMatrix + " and the link before it is length: " + newLink);
 			var nextStep = multMatVec(rotationMatrix, newLink);
 			
 			transFwdKine = add(transFwdKine, nextStep);

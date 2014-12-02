@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 12/1/14 - 10:04 PM
+ * Last Updated: 12/2/14 - 12:32 PM
  */ 
 
 var canvas;
@@ -777,22 +777,26 @@ function render() {
 
 				// Iterate through all the joints:
 				for(var k = 0; k < i; k++) {
-					console.log("joint[k] is: " + Number(jointAngles[k]) * Math.PI / 180.0);
+					console.log("joint[ " + k + "] is: " + Number(jointAngles[k]) * Math.PI / 180.0);
 					rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], Number(jointAngles[k]) * Math.PI / 180.0));
 				} // End for
 			
 				console.log("For joint " + (i + 1) + " the rotationMatrix is: " + rotationMatrix + " and the link before it is length: " + newLink);
 				var nextStep = multMatVec(rotationMatrix, newLink);
 			
-				//console.log("transFwdKineStep: " + transFwdKineStep);
-				//console.log("nextStep: " + nextStep);
+				console.log("transFwdKineStep: " + transFwdKineStep);
+				console.log("nextStep: " + nextStep);
 			
 				transFwdKineStep = add(transFwdKineStep, nextStep);
+				console.log("After add(transFwdKineStep, nextStep), transFwdKineStep is now: " + transFwdKineStep);
 			
 				// Add the previous translational forward kinematics to the step:
+				/*
 				for(var k = 0; k < i; k++) {
 					transFwdKineStep = add(transFwdKineStep, translationalForwardKinematics[k]);
 				} // End for
+				*/
+				transFwdKineStep = add(transFwdKineStep, translationalForwardKinematics[i-1]);
 			
 				console.log("transFwdKineStep: " + transFwdKineStep);
 			

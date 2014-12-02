@@ -24,12 +24,8 @@ h1 {
 } 
 
 /* Formatting for the kinematics data table. */
-table {
-	    text-align: center;
-		     color: black;
-	border-spacing: 5px;
+#kinematicsData {
+	table-layout: fixed;
+	width: 1300px;
 }
 
-td {
-	text-align: center;
-}

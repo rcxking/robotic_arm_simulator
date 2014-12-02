@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 12/2/14 - 12:32 PM
+ * Last Updated: 12/2/14 - 6:10 PM
  */ 
 
 var canvas;
@@ -66,8 +66,6 @@ var modelViewMatrixLoc;
 
 var projectionMatrix;
 var projectionMatrixLoc;
-
-var hasLoaded = 0;
 
 /*
  * This function allows new joint elements to be added to the simulator webpage.
@@ -184,7 +182,7 @@ function addJointCallback() {
 	
 	for(var i = 0; i < 5; i++) {
 		var td = document.createElement('TD');
-		td.width = '75';
+		td.width = '275';
 		td.appendChild(document.createTextNode("0"));
 		//dataTable.rows[dataTable.rows.length - 1].appendChild(td);
 		tableRow.appendChild(td);

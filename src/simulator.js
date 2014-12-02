@@ -180,6 +180,16 @@ function addJointCallback() {
 	 */
 	var dataTable = document.getElementById("kinematicsData");
 	var tableRow = document.createElement('TR');
+	
+	
+	for(var i = 0; i < 5; i++) {
+		var td = document.createElement('TD');
+		td.width = '75';
+		td.appendChild(document.createTextNode("0"));
+		//dataTable.rows[dataTable.rows.length - 1].appendChild(td);
+		tableRow.appendChild(td);
+	} // End for
+	
 	dataTable.appendChild(tableRow);
 	
 } // End function addHTMLElement()
@@ -790,14 +800,16 @@ function render() {
 			
 			} // End for
 			
-		
-			// Populate this row for joint i:
-			var td = document.createElement('TD');
-			td.width = '75';
-			td.appendChild(document.createTextNode("0"));
-			dataTable.rows[i].appendChild(td);
 		} // End if-else
 		console.log("Translational Forward Kinematics: " + translationalForwardKinematics);
+		
+		// Populate this row for joint i:
+
+		dataTable.children[i+1].children[0].innerHTML = i+1;
+		dataTable.children[i+1].children[1].innerHTML = translationalForwardKinematics[i][0];
+		dataTable.children[i+1].children[2].innerHTML = translationalForwardKinematics[i][1];
+		dataTable.children[i+1].children[3].innerHTML = translationalForwardKinematics[i][2];
+		dataTable.children[i+1].children[4].innerHTML = jointAngles[i];
 	} // End for
 	//console.log("Done populating kinematics table!");
 	

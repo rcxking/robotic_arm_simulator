@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 12/1/14 - 4:08 PM
+ * Last Updated: 12/1/14 - 10:04 PM
  */ 
 
 var canvas;
@@ -643,15 +643,15 @@ function render() {
 	
 		// Is this the first joint to render?
 		if(i == 0) {
-			console.log("This is the first joint to render!");
+			//console.log("This is the first joint to render!");
 			modelViewMatrix = mult(modelViewMatrix, translate(joints[0][0], joints[0][1], joints[0][2]));
 			modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[0][0], rotationAxes[0][1], rotationAxes[0][2]));
 			extrudeJoint(joints[0][3]);
 		} else {
 			// A link must first be drawn before the next joint is rendered:
-			console.log("This is the " + (i - 1) + " link to be rendered");
+			//console.log("This is the " + (i - 1) + " link to be rendered");
 				
-			console.log("Now extruding links[" + (i-1) + "]");
+			//console.log("Now extruding links[" + (i-1) + "]");
 			
 			/*
 			 * The robot arm links will be in only either the X, Y, or Z directions.
@@ -660,7 +660,6 @@ function render() {
 			
 			if(links[i - 1][0] != 0.25) {
 				// Translate in the X-Direction:
-				console.log("Translating in the X-Direction!");
 				modelViewMatrix = mult(modelViewMatrix, translate(JOINT_LENGTH / 2.0, 0.0, 0.0));
 				extrudeLink(i-1);
 				
@@ -670,7 +669,6 @@ function render() {
 				extrudeJoint(joints[i][3]);
 			} else if(links[i - 1][1] != 0.25) {
 				// Translate in the Y-Direction:
-				console.log("Translating in the Y-Direction!");
 				modelViewMatrix = mult(modelViewMatrix, translate(0.0, JOINT_WIDTH / 2.0, 0.0));
 				extrudeLink(i-1);
 				
@@ -680,7 +678,6 @@ function render() {
 				extrudeJoint(joints[i][3]);
 			} else {
 				// Translate in the Z-Direction:
-				console.log("Translating in the Z-Direction!");
 				modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0.0, JOINT_HEIGHT / 2.0));
 				extrudeLink(i-1);
 				
@@ -688,19 +685,26 @@ function render() {
 				modelViewMatrix = mult(modelViewMatrix, translate(0.0, 0.0, links[i-1][2]));
 				modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[i][0], rotationAxes[i][1], rotationAxes[i][2]));
 				extrudeJoint(joints[i][3]);
-			}
-			
+			} // End if-elseif-else
 		} // End else-if
 	} // End for
 	
+	// This array holds the translational forward kinematics calculated for each joint:
+	var translationalForwardKinematics = [];
+	
+	for(var i = 0; i < joints.length; i++) {
+		translationalForwardKinematics.push([]);
+	} // End for
+	
+	
 	// Let's now populate the kinematics table:
-	console.log("Now populating kinematics table.");
+	//console.log("Now populating kinematics table.");
 	for(var i = 0; i < joints.length; i++) {
 		
 		// This is a reference to the kinematicsData table element:
 		var dataTable = document.getElementById("kinematicsData");
 		
-		console.log("dataTable: " + dataTable);
+		//console.log("dataTable: " + dataTable);
 		
 		// Calculate the forward kinematics for this joint:
 		
@@ -728,57 +732,76 @@ function render() {
 		 * In the simulator, the reference frame is attached to the first joint.  This means
 		 * that P01 is 0 for all robot arms.
 		 */
-		var transFwdKine = [0, 0, 0];
+		 
+		 // Is this the first joint?
+		 if(i == 0) {
+			translationalForwardKinematics[0] = [joints[0][0], joints[0][1], joints[0][2]];
+		 } else {
+		 
+			// Iterate through all the links:
+			for(var j = 0; j < i; j++) {
 		
-		// Iterate through all the links:
-		for(var j = 0; j < i; j++) {
+				/*
+				* We need to reduce the X, Y, Z, values that are 0.25 to 0.
+				* These link values are 0.25 because that's the width of links to draw.
+				*/
+				var newLink = links[j].slice(0); // Make a copy by value, not by reference.
+				if(newLink[0] == 0.25) {
+					newLink[0] = 0.0;
+				} // End if
+			
+				if(newLink[1] == 0.25) {
+					newLink[1] = 0.0;
+				} // End if
+			
+				if(newLink[2] == 0.25) {
+					newLink[2] = 0.0;
+				} // End if
+			
+				//console.log("links[j] is: " + links[j]);
+				//console.log("newLink is: " + newLink);
+				var transFwdKineStep = [0, 0, 0];
 		
-			/*
-			 * We need to reduce the X, Y, Z, values that are 0.25 to 0.
-			 * These link values are 0.25 because that's the width of links to draw.
-			 */
-			var newLink = links[j].slice(0); // Make a copy by value, not by reference.
-			if(newLink[0] == 0.25) {
-				newLink[0] = 0.0;
-			} // End if
-			
-			if(newLink[1] == 0.25) {
-				newLink[1] = 0.0;
-			} // End if
-			
-			if(newLink[2] == 0.25) {
-				newLink[2] = 0.0;
-			} // End if
-			
-			//console.log("links[j] is: " + links[j]);
-			//console.log("newLink is: " + newLink);
-		
-			var rotationMatrix = mat3();
-			console.log("For joint " + (i + 1) + " the initial rotation Matrix is: " + rotationMatrix);
+				var rotationMatrix = mat3();
+				console.log("For joint " + (i + 1) + " the initial rotation Matrix is: " + rotationMatrix);
 
-			// Iterate through all the joints:
-			for(var k = 0; k < i; k++) {
-				console.log("joint[k] is: " + Number(jointAngles[k]) * Math.PI / 180.0);
-				rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], Number(jointAngles[k]) * Math.PI / 180.0));
+				// Iterate through all the joints:
+				for(var k = 0; k < i; k++) {
+					console.log("joint[k] is: " + Number(jointAngles[k]) * Math.PI / 180.0);
+					rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], Number(jointAngles[k]) * Math.PI / 180.0));
+				} // End for
+			
+				console.log("For joint " + (i + 1) + " the rotationMatrix is: " + rotationMatrix + " and the link before it is length: " + newLink);
+				var nextStep = multMatVec(rotationMatrix, newLink);
+			
+				//console.log("transFwdKineStep: " + transFwdKineStep);
+				//console.log("nextStep: " + nextStep);
+			
+				transFwdKineStep = add(transFwdKineStep, nextStep);
+			
+				// Add the previous translational forward kinematics to the step:
+				for(var k = 0; k < i; k++) {
+					transFwdKineStep = add(transFwdKineStep, translationalForwardKinematics[k]);
+				} // End for
+			
+				console.log("transFwdKineStep: " + transFwdKineStep);
+			
+				translationalForwardKinematics[i] = transFwdKineStep;
+			
 			} // End for
 			
-			console.log("For joint " + (i + 1) + " the rotationMatrix is: " + rotationMatrix + " and the link before it is length: " + newLink);
-			var nextStep = multMatVec(rotationMatrix, newLink);
-			
-			transFwdKine = add(transFwdKine, nextStep);
-			
-		} // End for
-		console.log("Translational Forward Kinematics: " + transFwdKine);
 		
-		// Populate this row for joint i:
-		var td = document.createElement('TD');
-		td.width = '75';
-		td.appendChild(document.createTextNode("0"));
-		dataTable.rows[i].appendChild(td);
+			// Populate this row for joint i:
+			var td = document.createElement('TD');
+			td.width = '75';
+			td.appendChild(document.createTextNode("0"));
+			dataTable.rows[i].appendChild(td);
+		} // End if-else
+		console.log("Translational Forward Kinematics: " + translationalForwardKinematics);
 	} // End for
-	console.log("Done populating kinematics table!");
+	//console.log("Done populating kinematics table!");
 	
-	console.log("Done rendering!");
+	//console.log("Done rendering!");
 	
 } // End function render()
 

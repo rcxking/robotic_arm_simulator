@@ -7,7 +7,7 @@ Bryant Pong
 ECSE-4750
 10/17/14
 
-Last Updated: 12/2/14 - 6:10 PM
+Last Updated: 12/2/14 - 10:09 PM
 -->
 
 <html>
@@ -31,7 +31,6 @@ Last Updated: 12/2/14 - 6:10 PM
 		uniform mat4 projectionMatrix;
 		
 		void main() {
-							
 			fColor = vColor;
 			gl_Position = projectionMatrix * modelViewMatrix * vPosition;
 		} // End vertex shader function main()
@@ -76,7 +75,7 @@ Last Updated: 12/2/14 - 6:10 PM
 			<input id="newJointColor" type="color">New Joint's Color</input><br/>
 
 			<form>
-				<input id="newJoint" type="button" value="Add Joint"/> <!--"addHTMLElement('range')"/>-->
+				<input id="newJoint" type="button" value="Add Joint"/> 
 		
 				<span id="nonexistent">&nbsp;</span>
 			</form>

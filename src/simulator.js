@@ -5,7 +5,7 @@
  * ECSE-4750
  * 10/18/14
  *
- * Last Updated: 12/2/14 - 6:10 PM
+ * Last Updated: 12/2/14 - 10:09 PM
  */ 
 
 var canvas;
@@ -45,21 +45,14 @@ var rotationAxes = [];
 
 // All the joint angles are stored in this array:
 var jointAngles = [];
+
+// A joint is 0.75 units cubed:
+var JOINT_LENGTH = 0.75;
+var JOINT_WIDTH = 0.75;
+var JOINT_HEIGHT = 0.75;
 /***END SECTION GLOBAL VARIABLES***/
 
-// Extraneous Variables to remove:
 var NumVertices = 0;
-
-/** END SECTION EXTRANEOUS VARIABLES TO REMOVE **/
-
-var xAxis = 0;
-var yAxis = 1;
-var zAxis = 2;
-
-var axis = 0;
-var theta = [ 0, 0, 0];
-
-var thetaLoc;
 
 var modelViewMatrix;
 var modelViewMatrixLoc;
@@ -77,17 +70,14 @@ var projectionMatrixLoc;
  */
 function addJointCallback() {
 
-	console.log("Now Adding New Joint");
-
 	/*
 	 * We will be using the DOM's createElement() function to create a slider 
 	 * element to allow the user to control a single joint:
 	 */
 	var sliderElement = document.createElement("input");
 
+	// The joint name is "joint" + number of joints created
 	var jointName = "joint" + String(numberOfJoints);
-	
-	console.log("jointName: " + jointName);
 	
 	var type ="range";
 	// Set the attributes of this new input element:
@@ -98,6 +88,7 @@ function addJointCallback() {
 	sliderElement.setAttribute("value", "0");
 	sliderElement.setAttribute("step", "1");
 	
+	// Add a placeholder joint angle value
 	jointAngles.push(0);
 
 	// Increase the number of joints in the robot arm:
@@ -105,11 +96,9 @@ function addJointCallback() {
 
 	var currentJointNumber = numberOfJoints;
 	
+	// Add an event listener to rotate the joint using a slider:
 	sliderElement.addEventListener("change", function() { 
-												//console.log("onchange triggered!"); 
-												//console.log(jointName + " angle is: " + document.getElementById(jointName).value);
 												jointAngles[currentJointNumber - 1] = document.getElementById(jointName).value;
-												//console.log("jointAngles: " + jointAngles);
 												render();
 											}, false);
 	
@@ -134,7 +123,6 @@ function addJointCallback() {
 	
 	// Convert the newJointColor (in hex) to a vec4 containing the RGB colors for the joint (VALIDATED):
 	var convertedJointColor = convertColor(newJointColor);
-	//console.log("convertedJointColor is: " + convertedJointColor);
 	
 	// Create the joint:
 	joints.push([newJointXPos, newJointYPos, newJointZPos, convertedJointColor]);
@@ -144,19 +132,13 @@ function addJointCallback() {
 	
 	// If this is not the first joint (joint 0), then we need to prepare a link to be rendered:
 	if(numberOfJoints != 1) {
-		console.log("This is not the first joint; rendering a new link between the " + (currentJointNumber - 1) + " and the " + currentJointNumber + "th joint");
-		
 		
 		// Calculate the X, Y, and Z changes between the previous joint and the new joint:
 		var deltaX = joints[currentJointNumber - 1][0] - joints[currentJointNumber - 2][0];
 		var deltaY = joints[currentJointNumber - 1][1] - joints[currentJointNumber - 2][1];
 		var deltaZ = joints[currentJointNumber - 1][2] - joints[currentJointNumber - 2][2];
 		
-		// DEBUG ONLY - PRINT OUT THE deltas:
-		console.log("deltaX: " + deltaX);
-		console.log("deltaY: " + deltaY);
-		console.log("deltaZ: " + deltaZ);
-		
+		// Set the length, width, and height of the link in the other directions.
 		if(deltaX == 0.0) {
 			deltaX += 0.25;
 		} 
@@ -184,7 +166,6 @@ function addJointCallback() {
 		var td = document.createElement('TD');
 		td.width = '275';
 		td.appendChild(document.createTextNode("0"));
-		//dataTable.rows[dataTable.rows.length - 1].appendChild(td);
 		tableRow.appendChild(td);
 	} // End for
 	
@@ -322,21 +303,18 @@ window.onload = function init() {
 	modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
 	projectionMatrixLoc = gl.getUniformLocation(program, "projectionMatrix");
 	
+	// The viewing window is from -10 to 10 feet in all directions:
 	projectionMatrix = ortho(-10, 10, -10, 10, -10, 10);
 	gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
     	
+	// Attach the addJointCallback to the new joint button:
 	document.getElementById("newJoint").onclick = function() {
-		
 		addJointCallback();
-	
-		console.log("after the newJointButton was clicked, before rendering, NumVertices is: " + NumVertices);
-		console.log("Before rendering, joints.length is: " + joints.length);
 		render();
 	};
 	
 	render();
 
-	/** END REMOVE THIS SECTION **/
 } // End function init()
 
 /*** ADDITIONAL MATRIX/VECTOR FUNCTIONS ***/
@@ -395,19 +373,6 @@ function multMatVec(matrix, vector) {
 /*** END SECTION ADDITIONAL MATRIX/VECTOR FUNCTIONS ***/
 
 /*** KINEMATICS FUNCTIONS ***/
-/* 
- * rot2D() creates a 2-Dimensional rotation matrix.  This function requires
- * the angle to rotate by (in radians).
- *
- * Inputs: theta (rotation angle in radians)
- * Returns: 2x2 mat2() Rotation Matrix
- *
- * Verified/Tested 10/20/14
- */
-function rot2D(theta) {
-	return mat2(Math.cos(theta), -1 * Math.sin(theta), 
-	            Math.sin(theta), Math.cos(theta));
-} // End function rot2D()
 
 /*
  * rot3D() creates a 3-Dimensional rotation matrix via the Euler-Rodrigues
@@ -432,13 +397,11 @@ function rot3D(k, theta) {
 	var kx = mat3(     0, -1*k[2],   k[1],
 	                 k[2],     0, -1*k[0],
 				  -1*k[1],   k[0],     0);
-	console.log("kx is: " + kx);
 	
 	var I3 = mat3(1, 0, 0,
 	              0, 1, 0,
                   0, 0, 1);
-	console.log("I3 is: " + I3);
-
+	
 	var subMatrix = add(add(I3, scaleMatrix(Math.sin(theta), kx)),
 	                    mult(scaleMatrix((1-Math.cos(theta)), kx), kx));
 
@@ -577,16 +540,10 @@ function scale4(a, b, c) {
 	return result;
 }
 
-var JOINT_LENGTH = 0.75;
-var JOINT_WIDTH = 0.75;
-var JOINT_HEIGHT = 0.75;
+
 
 // This function renders a single link:
 function extrudeLink(linkToRender) {
-
-	console.log("links[" + linkToRender + "][0] is: " + links[linkToRender][0]);
-	console.log("links[" + linkToRender + "][1] is: " + links[linkToRender][1]);
-	console.log("links[" + linkToRender + "][2] is: " + links[linkToRender][2]);
 
 	var s = scale4(Number(links[linkToRender][0]), Number(links[linkToRender][1]), Number(links[linkToRender][2]));
 	var instanceMatrix;
@@ -600,7 +557,6 @@ function extrudeLink(linkToRender) {
 	} // End if-else-if
 	
 	var t = mult(modelViewMatrix, instanceMatrix);
-	console.log("t is: " + t);
 	gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(t));
 	
 	for(var i = 108; i < 108 + 36; i++) {
@@ -651,15 +607,11 @@ function render() {
 	
 		// Is this the first joint to render?
 		if(i == 0) {
-			//console.log("This is the first joint to render!");
 			modelViewMatrix = mult(modelViewMatrix, translate(joints[0][0], joints[0][1], joints[0][2]));
 			modelViewMatrix = mult(modelViewMatrix, rotate(jointAngles[i], rotationAxes[0][0], rotationAxes[0][1], rotationAxes[0][2]));
 			extrudeJoint(joints[0][3]);
 		} else {
 			// A link must first be drawn before the next joint is rendered:
-			//console.log("This is the " + (i - 1) + " link to be rendered");
-				
-			//console.log("Now extruding links[" + (i-1) + "]");
 			
 			/*
 			 * The robot arm links will be in only either the X, Y, or Z directions.
@@ -706,13 +658,10 @@ function render() {
 	
 	
 	// Let's now populate the kinematics table:
-	//console.log("Now populating kinematics table.");
 	for(var i = 0; i < joints.length; i++) {
 		
 		// This is a reference to the kinematicsData table element:
 		var dataTable = document.getElementById("kinematicsData");
-		
-		//console.log("dataTable: " + dataTable);
 		
 		// Calculate the forward kinematics for this joint:
 		
@@ -727,8 +676,6 @@ function render() {
 		for(var j = 0; j < i; j++) {
 			rotFwdKine += Number(jointAngles[j]);
 		} // End for
-		
-		console.log("Rotational Forward Kinematics: " + rotFwdKine);
 		
 		/*
 		 * Translational forward kinematics:
@@ -766,57 +713,36 @@ function render() {
 					newLink[2] = 0.0;
 				} // End if
 			
-				//console.log("links[j] is: " + links[j]);
-				//console.log("newLink is: " + newLink);
 				var transFwdKineStep = [0, 0, 0];
 		
 				var rotationMatrix = mat3();
-				console.log("For joint " + (i + 1) + " the initial rotation Matrix is: " + rotationMatrix);
 
 				// Iterate through all the joints:
 				for(var k = 0; k < i; k++) {
-					console.log("joint[ " + k + "] is: " + Number(jointAngles[k]) * Math.PI / 180.0);
 					rotationMatrix = mult(rotationMatrix, rot3D(rotationAxes[k], Number(jointAngles[k]) * Math.PI / 180.0));
 				} // End for
 			
-				console.log("For joint " + (i + 1) + " the rotationMatrix is: " + rotationMatrix + " and the link before it is length: " + newLink);
 				var nextStep = multMatVec(rotationMatrix, newLink);
 			
-				console.log("transFwdKineStep: " + transFwdKineStep);
-				console.log("nextStep: " + nextStep);
-			
 				transFwdKineStep = add(transFwdKineStep, nextStep);
-				console.log("After add(transFwdKineStep, nextStep), transFwdKineStep is now: " + transFwdKineStep);
 			
 				// Add the previous translational forward kinematics to the step:
-				/*
-				for(var k = 0; k < i; k++) {
-					transFwdKineStep = add(transFwdKineStep, translationalForwardKinematics[k]);
-				} // End for
-				*/
 				transFwdKineStep = add(transFwdKineStep, translationalForwardKinematics[i-1]);
-			
-				console.log("transFwdKineStep: " + transFwdKineStep);
 			
 				translationalForwardKinematics[i] = transFwdKineStep;
 			
 			} // End for
 			
 		} // End if-else
-		console.log("Translational Forward Kinematics: " + translationalForwardKinematics);
 		
 		// Populate this row for joint i:
-
-		dataTable.children[i+1].children[0].innerHTML = i+1;
-		dataTable.children[i+1].children[1].innerHTML = translationalForwardKinematics[i][0];
-		dataTable.children[i+1].children[2].innerHTML = translationalForwardKinematics[i][1];
-		dataTable.children[i+1].children[3].innerHTML = translationalForwardKinematics[i][2];
-		dataTable.children[i+1].children[4].innerHTML = jointAngles[i];
+		dataTable.children[i+1].children[0].innerHTML = i+1; // Joint Number
+		dataTable.children[i+1].children[1].innerHTML = translationalForwardKinematics[i][0]; // Joint X-Position
+		dataTable.children[i+1].children[2].innerHTML = translationalForwardKinematics[i][1]; // Joint Y-Position
+		dataTable.children[i+1].children[3].innerHTML = translationalForwardKinematics[i][2]; // Joint Z-Position
+		dataTable.children[i+1].children[4].innerHTML = jointAngles[i]; // Joint Angle
+		
 	} // End for
-	//console.log("Done populating kinematics table!");
-	
-	//console.log("Done rendering!");
-	
 } // End function render()
 
 /*** END SECTION DRAWING FUNCTIONS ***/
